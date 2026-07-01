@@ -72,10 +72,10 @@ link to each guest; the link decides what that guest sees.
   - *Full Guest*: full timeline including pre-reception/ceremony events.
   - *Reception Guest*: timeline filtered to reception-phase events and later.
     Earlier events are not shown or hinted at.
-- **F-1.3** Timeline is **data-driven**: each event has a time, title,
-  description, optional location, and a **visibility** value (`all` =
-  everyone, `full_only` = Full Guests only). Reception Guests see only `all`
-  events.
+- **F-1.3** Timeline events (time, title, description, visibility) are defined
+  as constants in `backend/app/routers/home.py`. Editing them requires a code
+  change and redeploy. Visibility (`all` = everyone, `full_only` = Full Guests
+  only) is still enforced server-side; Reception Guests see only `all` events.
 - **F-1.4** A greeting on arrival. Because the link is shared per tier (§2),
   default to a generic greeting (e.g. "Welcome!"). If the optional one-time
   name-entry (R-2.7) is enabled, greet by the name the guest typed.
@@ -136,8 +136,10 @@ You cannot run or test the public site without these. Keep it minimal but real.
   name and **table** assignment. Optionally note which tier each guest belongs
   to so the couple knows which of the two links to send them — this is a record
   for the couple, it does not affect access.
-- **F-5.3** Manage **timeline events**, **dress code**, **venue details**, and
-  **travel-guide content** without code changes.
+- **F-5.3** Wedding date, venue details, dress code, and timeline events are
+  **code-managed** — edit `backend/app/routers/home.py` and redeploy to update
+  them. The admin UI manages **travel-guide content** and **gallery moderation**
+  only.
 - **F-5.4** Manage **tables** and seat assignments.
 - **F-5.5** **Moderate** the gallery (hide/delete; approve if pre-approval mode).
 

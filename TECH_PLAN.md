@@ -141,8 +141,13 @@ photos
   created_at      timestamptz
 
 site_content                       -- single-row-ish KV for editable copy
-  key             text pk          -- 'date','venue','dress_code','travel_*'
+  key             text pk          -- 'travel_*' keys only (see note below)
   value           jsonb
+
+-- NOTE: timeline_events and the date/venue/dress_code keys in site_content are
+-- NOT used. Wedding date, venue, dress code, and all timeline events are
+-- hardcoded constants in backend/app/routers/home.py and require a code change
+-- + redeploy to update. site_content is retained for travel-guide content only.
 
 admins
   id              uuid pk
@@ -245,10 +250,12 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
   a reception token calling a full-only test endpoint gets `403` (verified by
   test); token never visible in JS/URL after entry.
 
-### Sprint 2 — Home page
+### Sprint 2 — Home page ✓ COMPLETE
 - **Goal:** Date, venue, dress code, tier-filtered timeline.
-- **Tasks:** `timeline_events` + `site_content`; `GET /api/home` filtering by
-  tier; responsive home UI for both variants; personalised greeting.
+- **Implementation:** Home-page data (date, venue, dress code, timeline) is
+  served from hardcoded constants in `backend/app/routers/home.py`; no DB
+  queries are made for the home route. Edit those constants and redeploy to
+  update wedding details or timeline events.
 - **DoD:** Full Guest sees all events; Reception Guest sees only `all` events
   with no leak of earlier ones; mobile layout verified.
 
@@ -280,10 +287,13 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
 ### Sprint 6 — Admin, polish, launch
 - **Goal:** Couple can run everything; production-ready.
 - **Tasks:** Admin login; guest CRUD + tier/table assignment; token
-  generate/revoke; **invite-link CSV export + per-guest QR**; event/content/
-  table editors; gallery moderation UI; `noindex`, SEO/OG basics, error pages,
-  loading states, accessibility pass; production deploy + custom domain; warm-up
-  ping for event window; content population; end-to-end test of both tiers.
+  generate/revoke; **invite-link CSV export + per-guest QR**; table editors;
+  travel-guide content editor (`site_content travel_*` keys); gallery moderation
+  UI; `noindex`, SEO/OG basics, error pages, loading states, accessibility pass;
+  production deploy + custom domain; warm-up ping for event window; content
+  population; end-to-end test of both tiers.
+  *(Timeline events and venue/dress-code details are code-managed in `home.py`
+  — no admin UI needed for those.)*
 - **DoD:** Couple adds a guest, generates a link, prints a QR, and the guest
   reaches the correct tiered experience — all without developer help.
 
