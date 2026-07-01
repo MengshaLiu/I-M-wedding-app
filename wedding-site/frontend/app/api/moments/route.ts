@@ -7,7 +7,7 @@ const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
 
 export async function GET(req: NextRequest) {
   const page = req.nextUrl.searchParams.get("page") ?? "1";
-  const res = await backendFetch(`/api/gallery?page=${page}`);
+  const res = await backendFetch(`/api/moments?page=${page}`);
   const data = await res.json();
   return NextResponse.json(data, { status: res.status });
 }
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
 
-  const res = await fetch(`${API_URL}/api/gallery`, {
+  const res = await fetch(`${API_URL}/api/moments`, {
     method: "POST",
     headers: { Authorization: `Bearer ${jwt}` },
     body: formData,

@@ -29,7 +29,7 @@ const F = {
   dancing: "var(--font-dancing), 'Dancing Script', cursive",
 } as const;
 
-export default function GalleryPage() {
+export default function MomentsPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -49,7 +49,7 @@ export default function GalleryPage() {
   const fetchPhotos = useCallback(async (p: number, append = false) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/gallery?page=${p}`);
+      const res = await fetch(`/api/moments?page=${p}`);
       const data = await res.json();
       setTotal(data.total ?? 0);
       setPhotos(prev => append ? [...prev, ...(data.photos ?? [])] : (data.photos ?? []));
@@ -83,7 +83,7 @@ export default function GalleryPage() {
       fd.append("file", file);
       fd.append("uploader_name", uploaderName.trim());
       fd.append("message", message.trim());
-      const res = await fetch("/api/gallery", { method: "POST", body: fd });
+      const res = await fetch("/api/moments", { method: "POST", body: fd });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.detail ?? "Upload failed");
@@ -112,13 +112,13 @@ export default function GalleryPage() {
         textAlign: "center",
       }}>
         <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px,5vw,24px)", color: C.sage, margin: "0 0 4px" }}>
-          capture the moment
+          Capture the moment
         </p>
         <h1 style={{
           fontFamily: F.cormorant, fontSize: "clamp(36px,8vw,56px)",
           fontWeight: 400, color: C.deep, margin: "0 0 16px",
         }}>
-          Gallery
+          Moments
         </h1>
         <p style={{ fontSize: 14, color: C.muted, margin: "0 0 32px", lineHeight: 1.6 }}>
           Share your photos and wishes from the day.

@@ -26,11 +26,11 @@ function isGuestPath(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname.startsWith("/seats") ||
-    pathname.startsWith("/gallery") ||
+    pathname.startsWith("/moments") ||
     pathname.startsWith("/travel")
   );
 }
 
 export const config = {
-  matcher: ["/", "/seats/:path*", "/gallery/:path*", "/travel/:path*"],
+  matcher: ["/", "/seats/:path*", "/moments/:path*", "/travel/:path*"],
 };

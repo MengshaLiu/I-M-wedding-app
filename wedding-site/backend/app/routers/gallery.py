@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api")
 PER_PAGE = 20
 
 
-@router.get("/gallery", response_model=GalleryResponse)
+@router.get("/moments", response_model=GalleryResponse)
 async def list_gallery(
     page: int = 1,
     _tier: str = Depends(get_current_tier),
@@ -58,7 +58,7 @@ async def list_gallery(
     )
 
 
-@router.post("/gallery", response_model=PhotoOut, status_code=201)
+@router.post("/moments", response_model=PhotoOut, status_code=201)
 async def upload_photo(
     file: UploadFile = File(...),
     uploader_name: str = Form(...),

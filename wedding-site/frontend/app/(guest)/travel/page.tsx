@@ -54,7 +54,7 @@ export default async function TravelPage() {
         {/* ── Header ── */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px,5vw,24px)", color: C.sage, margin: "0 0 4px" }}>
-            explore Kota Kinabalu
+            Explore Kota Kinabalu
           </p>
           <h1 style={{
             fontFamily: F.cormorant, fontSize: "clamp(36px,8vw,56px)",

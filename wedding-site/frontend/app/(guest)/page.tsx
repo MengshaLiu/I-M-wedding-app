@@ -85,7 +85,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
           fontFamily: F.dancing, fontSize: "clamp(22px, 6vw, 28px)", color: C.sage,
           margin: "8px 0 0",
         }}>
-          are getting married
+          We are getting married
         </p>
       </div>
 
@@ -156,7 +156,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
             }} />
 
           <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>
-            the celebration
+            The celebration
           </p>
           <h3 style={{
             fontFamily: F.cormorant, fontSize: "clamp(26px, 6vw, 36px)", fontWeight: 500,

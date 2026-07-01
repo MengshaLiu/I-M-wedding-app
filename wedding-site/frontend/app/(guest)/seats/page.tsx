@@ -82,7 +82,7 @@ export default function SeatsPage() {
 
         {/* ── Header ── */}
         <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px, 5vw, 24px)", color: C.sage, margin: "0 0 6px" }}>
-          where are you sitting?
+          Where are you sitting?
         </p>
         <h1 style={{
           fontFamily: F.cormorant, fontSize: "clamp(32px, 8vw, 48px)", fontWeight: 400,

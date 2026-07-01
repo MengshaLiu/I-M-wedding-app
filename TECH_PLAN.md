@@ -80,7 +80,7 @@ wedding-site/
 │  │  ├─ i/[token]/route.ts  # entry: validate token → set cookie → redirect /
 │  │  ├─ (guest)/page.tsx    # home (tier-aware)
 │  │  ├─ (guest)/seats/…     # seat finder
-│  │  ├─ (guest)/gallery/…   # photo + wishes
+│  │  ├─ (guest)/moments/…   # photo + wishes
 │  │  ├─ (guest)/travel/…    # full-guest only
 │  │  ├─ api/…               # BFF route handlers → FastAPI
 │  │  └─ admin/…             # couple's admin UI
@@ -165,8 +165,8 @@ admins
 - `GET  /api/me` → `{display_name, tier}`
 - `GET  /api/home` → venue/date/dress code + **timeline filtered by tier**
 - `GET  /api/seats?q=<name>` → fuzzy match → table label (+ optional tablemates)
-- `GET  /api/gallery` → visible photos (paginated)
-- `POST /api/gallery` (multipart) → upload photo + message (validated, resized)
+- `GET  /api/moments` → visible photos (paginated)
+- `POST /api/moments` (multipart) → upload photo + message (validated, resized)
 - `GET  /api/travel` → **`require_full_tier`**; `403` for reception guests
 
 **Admin (admin auth required):**
@@ -269,9 +269,9 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
 
 ### Sprint 4 — Photo + wishes gallery
 - **Goal:** Upload and view photos with messages.
-- **Tasks:** `photos` model; `POST /api/gallery` (validate, Pillow resize +
+- **Tasks:** `photos` model; `POST /api/moments` (validate, Pillow resize +
   thumbnail, strip EXIF, store to R2/Supabase); per-guest rate limit; `GET
-  /api/gallery` paginated; gallery UI with lazy thumbnails; moderation status
+  /api/moments` paginated; gallery UI with lazy thumbnails; moderation status
   handling (auto-show or pre-approve per decision).
 - **DoD:** Upload from mobile works; non-images/oversize rejected; thumbnails
   render fast; hidden/pending photos don't show to guests.

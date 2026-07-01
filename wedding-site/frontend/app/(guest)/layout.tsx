@@ -35,7 +35,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
 
   if (isFullGuest) {
     const links = [
-      { label: "Gallery", href: "/gallery" },
+      { label: "Moments", href: "/moments" },
       { label: "Seat Finder", href: "/seats" },
       { label: "Travel", href: "/travel" },
     ];
@@ -89,7 +89,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
           </Link>
           <div className="flex gap-5 text-sm">
             <Link href="/" className="hover:text-sage transition-colors">Home</Link>
-            <Link href="/gallery" className="hover:text-sage transition-colors">Gallery</Link>
+            <Link href="/moments" className="hover:text-sage transition-colors">Moments</Link>
             <Link href="/seats" className="hover:text-sage transition-colors">Seat Finder</Link>
           </div>
         </nav>
