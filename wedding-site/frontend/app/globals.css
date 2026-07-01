@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-ivory text-charcoal font-sans;
+    background-color: #f8f5e8;
+    @apply text-charcoal font-sans;
   }
   h1, h2, h3 {
     @apply font-serif;
