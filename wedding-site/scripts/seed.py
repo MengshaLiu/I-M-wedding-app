@@ -86,8 +86,8 @@ async def seed():
         content = {
             "date": {"text": "Saturday, 12 September 2026"},
             "venue_name": {"text": "The Grand Ballroom, Kuala Lumpur"},
-            "venue_address": {"text": "123 Jalan Bukit Bintang, 55100 Kuala Lumpur, Malaysia"},
-            "venue_map_url": {"text": "https://maps.google.com/?q=Kuala+Lumpur"},
+            "venue_address": {"text": "No. 20, Jalan Aru, Tanjung Aru, 88100 Kota Kinabalu, Sabah, Malaysia"},
+           "venue_map_url": {"text": "https://maps.google.com/?q=123+Jalan+Bukit+Bintang,+55100+Kuala+Lumpur,+Malaysia"},
             "dress_code": {"text": "Formal — Soft florals and pastels welcome"},
         }
         import json
