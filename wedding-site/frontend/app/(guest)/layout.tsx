@@ -34,6 +34,11 @@ export default async function GuestLayout({ children }: { children: React.ReactN
   const isFullGuest = tier === "full";
 
   if (isFullGuest) {
+    const links = [
+      { label: "Gallery", href: "/gallery" },
+      { label: "Seat Finder", href: "/seats" },
+      { label: "Travel", href: "/travel" },
+    ];
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: C.bg }}>
         <header style={{
@@ -53,34 +58,28 @@ export default async function GuestLayout({ children }: { children: React.ReactN
             }}>
               I &amp; M
             </Link>
-            <div style={{ display: "flex", gap: 28 }}>
-              {(["Home", "Seat Finder", "Travel"] as const).map((label) => {
-                const href = label === "Home" ? "/" : label === "Seat Finder" ? "/seats" : "/travel";
-                return (
-                  <Link key={label} href={href} style={{
-                    fontFamily: F.mulish,
-                    fontSize: 11, fontWeight: 600,
-                    letterSpacing: "0.2em", textTransform: "uppercase",
-                    color: C.line, textDecoration: "none",
-                  }}
-                    className="nav-link-full"
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
+            <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
+              {links.map(({ label, href }) => (
+                <Link key={label} href={href} className="nav-link-full" style={{
+                  fontFamily: F.mulish,
+                  fontSize: 10, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: C.line, textDecoration: "none",
+                  whiteSpace: "nowrap",
+                }}>
+                  {label}
+                </Link>
+              ))}
             </div>
           </nav>
           <style>{`.nav-link-full:hover { color: ${C.sage} !important; }`}</style>
         </header>
-
-        <main style={{ flex: 1 }}>
-          {children}
-        </main>
+        <main style={{ flex: 1 }}>{children}</main>
       </div>
     );
   }
 
+  // Reception guest layout
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white border-b border-blush shadow-sm sticky top-0 z-10">
@@ -89,23 +88,14 @@ export default async function GuestLayout({ children }: { children: React.ReactN
             I &amp; M
           </Link>
           <div className="flex gap-5 text-sm">
-            <Link href="/" className="hover:text-sage transition-colors">
-              Home
-            </Link>
-            <Link href="/seats" className="hover:text-sage transition-colors">
-              Seat Finder
-            </Link>
+            <Link href="/" className="hover:text-sage transition-colors">Home</Link>
+            <Link href="/gallery" className="hover:text-sage transition-colors">Gallery</Link>
+            <Link href="/seats" className="hover:text-sage transition-colors">Seat Finder</Link>
           </div>
         </nav>
       </header>
-
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
-        {children}
-      </main>
-
-      <footer className="text-center text-xs text-gray-400 py-6">
-        Made with love ♡
-      </footer>
+      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">{children}</main>
+      <footer className="text-center text-xs text-gray-400 py-6">Made with love ♡</footer>
     </div>
   );
 }

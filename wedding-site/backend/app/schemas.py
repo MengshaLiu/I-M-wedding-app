@@ -39,3 +39,38 @@ class SeatResult(BaseModel):
 class SeatsResponse(BaseModel):
     results: list[SeatResult]
     query: str
+
+
+# ── Gallery ──────────────────────────────────────────────────────────────────
+
+class PhotoOut(BaseModel):
+    id: str
+    uploader_name: str
+    message: str | None
+    url: str
+    thumb_url: str
+    created_at: str
+
+
+class GalleryResponse(BaseModel):
+    photos: list[PhotoOut]
+    total: int
+    page: int
+    per_page: int
+
+
+# ── Travel guide ─────────────────────────────────────────────────────────────
+
+class TravelItem(BaseModel):
+    name: str
+    description: str
+    tip: str | None = None
+
+
+class TravelSection(BaseModel):
+    title: str
+    items: list[TravelItem]
+
+
+class TravelResponse(BaseModel):
+    sections: list[TravelSection]

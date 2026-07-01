@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     minio_access_key: str = "minioadmin"
     minio_secret_key: str = "minioadmin"
     minio_bucket: str = "wedding-photos"
+    minio_public_url: str = "http://localhost:9000"
 
 
 settings = Settings()
