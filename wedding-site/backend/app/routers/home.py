@@ -6,7 +6,7 @@ from app.schemas import HomeResponse, TimelineEventOut
 router = APIRouter(prefix="/api")
 
 # ── Wedding details — edit here to update the site ──────────────────────────
-WEDDING_DATE = "Saturday, 12 September 2026"
+WEDDING_DATE = "Saturday, 12 September"
 VENUE_NAME = "Shangri-La Tanjung Aru"
 VENUE_ADDRESS = "No. 20, Jalan Aru, Tanjung Aru, 88100 Kota Kinabalu, Sabah, Malaysia"
 VENUE_MAP_URL = "https://maps.app.goo.gl/Q2UqWTeGjsryFikd7"
