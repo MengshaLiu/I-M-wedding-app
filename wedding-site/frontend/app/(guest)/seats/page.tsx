@@ -7,13 +7,21 @@ interface SeatResult {
   table_label: string;
 }
 
-function useDebounce<T extends unknown[]>(fn: (...args: T) => void, delay: number) {
-  let timer: ReturnType<typeof setTimeout>;
-  return (...args: T) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
+const C = {
+  deep: "oklch(36% .072 152)",
+  sage: "oklch(55% .09 150)",
+  muted: "oklch(0.5 0.04 150)",
+  line: "oklch(0.82 0.03 140)",
+  bg: "#f8f5e8",
+  btnBg: "#59745B",
+  btnText: "oklch(0.985 0.012 110)",
+} as const;
+
+const F = {
+  cormorant: "var(--font-cormorant), 'Cormorant Garamond', serif",
+  mulish: "var(--font-mulish), 'Mulish', sans-serif",
+  dancing: "var(--font-dancing), 'Dancing Script', cursive",
+} as const;
 
 export default function SeatsPage() {
   const [query, setQuery] = useState("");
@@ -62,68 +70,128 @@ export default function SeatsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="text-center space-y-1 pt-4">
-        <h1 className="text-3xl font-serif text-charcoal">Find Your Seat</h1>
-        <p className="text-sm text-gray-500">Type your name to find your table assignment.</p>
-      </section>
+    <div style={{
+      minHeight: "calc(100vh - 53px)", display: "flex", flexDirection: "column",
+      alignItems: "center", fontFamily: F.mulish, color: C.deep,
+      backgroundColor: C.bg, overflowX: "hidden",
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 520, padding: "56px 20px 64px",
+        display: "flex", flexDirection: "column", alignItems: "center",
+      }}>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={query}
-          onChange={handleChange}
-          placeholder="Your name…"
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blush bg-white"
-          autoFocus
-        />
-        <button
-          type="submit"
-          className="px-5 py-3 bg-sage text-white text-sm rounded-xl hover:opacity-90 transition"
-        >
-          Search
-        </button>
-      </form>
+        {/* ── Header ── */}
+        <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px, 5vw, 24px)", color: C.sage, margin: "0 0 6px" }}>
+          where are you sitting?
+        </p>
+        <h1 style={{
+          fontFamily: F.cormorant, fontSize: "clamp(32px, 8vw, 48px)", fontWeight: 400,
+          color: C.deep, margin: "0 0 10px", textAlign: "center",
+        }}>
+          Find Your Seat
+        </h1>
+        <p style={{
+          fontFamily: F.mulish, fontSize: 13, color: C.muted,
+          margin: "0 0 40px", textAlign: "center", letterSpacing: "0.01em",
+        }}>
+          Type your name to find your table assignment.
+        </p>
 
-      {loading && (
-        <p className="text-center text-sm text-gray-400">Searching…</p>
-      )}
+        {/* ── Search form ── */}
+        <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", gap: 10 }}>
+          <input
+            type="text"
+            value={query}
+            onChange={handleChange}
+            placeholder="Your name…"
+            autoFocus
+            className="seats-input"
+            style={{
+              flex: 1, border: `1px solid ${C.line}`, borderRadius: 12,
+              padding: "13px 16px", fontSize: 14, fontFamily: F.mulish,
+              color: C.deep, backgroundColor: "rgba(255,255,255,0.8)",
+              outline: "none", minWidth: 0,
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+              letterSpacing: "0.22em", textTransform: "uppercase",
+              color: C.btnText, backgroundColor: C.btnBg,
+              padding: "13px 20px", border: "none", cursor: "pointer",
+              borderRadius: 12, whiteSpace: "nowrap", flexShrink: 0,
+            }}
+          >
+            Search
+          </button>
+        </form>
 
-      {!loading && searched && results !== null && results.length === 0 && (
-        <div className="text-center bg-white rounded-2xl p-6 border border-blush space-y-2">
-          <p className="text-sm text-gray-600">
-            We couldn&apos;t find <strong>&ldquo;{query}&rdquo;</strong> in the guest list.
+        {/* ── Loading ── */}
+        {loading && (
+          <p style={{ fontFamily: F.mulish, fontSize: 13, color: C.muted, marginTop: 36 }}>
+            Searching…
           </p>
-          <p className="text-xs text-gray-400">
-            Please refer to the physical seating board at the venue, or contact us for help.
-          </p>
-        </div>
-      )}
+        )}
 
-      {!loading && results && results.length > 0 && (
-        <ul className="space-y-3">
-          {results.map((r, i) => (
-            <li
-              key={i}
-              className="bg-white rounded-2xl border border-blush p-5 flex items-center justify-between shadow-sm"
-            >
-              <div>
-                <p className="font-medium text-charcoal">{r.display_name}</p>
-              </div>
-              <div className="text-right">
-                <span className="inline-block bg-blush text-charcoal text-xs font-medium px-3 py-1 rounded-full">
+        {/* ── No results ── */}
+        {!loading && searched && results !== null && results.length === 0 && (
+          <div style={{
+            width: "100%", marginTop: 28, border: `1px solid ${C.line}`,
+            borderRadius: 16, padding: "28px 24px", textAlign: "center",
+            backgroundColor: "rgba(255,255,255,0.65)",
+          }}>
+            <p style={{ fontFamily: F.cormorant, fontSize: 22, fontWeight: 400, color: C.deep, margin: "0 0 8px" }}>
+              Name not found
+            </p>
+            <p style={{ fontFamily: F.mulish, fontSize: 13, color: C.muted, margin: 0, lineHeight: 1.6 }}>
+              We couldn&apos;t find <strong>&ldquo;{query}&rdquo;</strong> in the guest list.
+              Please refer to the seating board at the venue.
+            </p>
+          </div>
+        )}
+
+        {/* ── Results ── */}
+        {!loading && results && results.length > 0 && (
+          <div style={{ width: "100%", marginTop: 28, display: "flex", flexDirection: "column", gap: 10 }}>
+            {results.map((r, i) => (
+              <div key={i} style={{
+                border: `1px solid ${C.line}`, borderRadius: 16,
+                padding: "18px 22px", display: "flex", alignItems: "center",
+                justifyContent: "space-between", gap: 12,
+                backgroundColor: "rgba(255,255,255,0.65)",
+              }}>
+                <p style={{
+                  fontFamily: F.cormorant, fontSize: 24, fontWeight: 500,
+                  color: C.deep, margin: 0,
+                }}>
+                  {r.display_name}
+                </p>
+                <span style={{
+                  fontFamily: F.mulish, fontSize: 10, fontWeight: 600,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: C.btnText, backgroundColor: C.btnBg,
+                  padding: "6px 14px", borderRadius: 20, whiteSpace: "nowrap",
+                }}>
                   {r.table_label}
                 </span>
               </div>
-            </li>
-          ))}
-          {results.length > 1 && (
-            <p className="text-xs text-center text-gray-400">
-              Multiple matches found — select yours above.
-            </p>
-          )}
-        </ul>
-      )}
+            ))}
+            {results.length > 1 && (
+              <p style={{
+                fontFamily: F.mulish, fontSize: 11, color: C.muted,
+                textAlign: "center", margin: "4px 0 0",
+              }}>
+                Multiple matches — select yours above.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        .seats-input:focus { border-color: ${C.sage} !important; box-shadow: 0 0 0 3px oklch(55% .09 150 / 0.12); }
+      `}</style>
     </div>
   );
 }

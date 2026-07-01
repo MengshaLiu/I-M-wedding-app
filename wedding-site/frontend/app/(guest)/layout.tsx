@@ -5,6 +5,19 @@ import { jwtVerify } from "jose";
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
 const SESSION_SECRET = new TextEncoder().encode(process.env.SESSION_SECRET ?? "");
 
+const C = {
+  deep: "oklch(36% .072 152)",
+  sage: "oklch(55% .09 150)",
+  muted: "oklch(0.5 0.04 150)",
+  line: "oklch(0.82 0.03 140)",
+  bg: "#f8f5e8",
+} as const;
+
+const F = {
+  cormorant: "var(--font-cormorant), 'Cormorant Garamond', serif",
+  mulish: "var(--font-mulish), 'Mulish', sans-serif",
+} as const;
+
 async function getTier(): Promise<string | null> {
   try {
     const token = (await cookies()).get(SESSION_COOKIE)?.value;
@@ -20,6 +33,54 @@ export default async function GuestLayout({ children }: { children: React.ReactN
   const tier = await getTier();
   const isFullGuest = tier === "full";
 
+  if (isFullGuest) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: C.bg }}>
+        <header style={{
+          backgroundColor: C.deep,
+          borderBottom: `1px solid ${C.line}`,
+          position: "sticky", top: 0, zIndex: 10,
+        }}>
+          <nav style={{
+            maxWidth: 720, margin: "0 auto", padding: "14px 20px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+          }}>
+            <Link href="/" style={{
+              fontFamily: F.cormorant,
+              fontSize: 22, fontWeight: 500,
+              color: C.line, textDecoration: "none",
+              letterSpacing: "0.05em",
+            }}>
+              I &amp; M
+            </Link>
+            <div style={{ display: "flex", gap: 28 }}>
+              {(["Home", "Seat Finder", "Travel"] as const).map((label) => {
+                const href = label === "Home" ? "/" : label === "Seat Finder" ? "/seats" : "/travel";
+                return (
+                  <Link key={label} href={href} style={{
+                    fontFamily: F.mulish,
+                    fontSize: 11, fontWeight: 600,
+                    letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: C.line, textDecoration: "none",
+                  }}
+                    className="nav-link-full"
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+          <style>{`.nav-link-full:hover { color: ${C.sage} !important; }`}</style>
+        </header>
+
+        <main style={{ flex: 1 }}>
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white border-b border-blush shadow-sm sticky top-0 z-10">
@@ -34,11 +95,6 @@ export default async function GuestLayout({ children }: { children: React.ReactN
             <Link href="/seats" className="hover:text-sage transition-colors">
               Seat Finder
             </Link>
-            {isFullGuest && (
-              <Link href="/travel" className="hover:text-sage transition-colors">
-                Travel
-              </Link>
-            )}
           </div>
         </nav>
       </header>
