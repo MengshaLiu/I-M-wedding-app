@@ -1,10 +1,6 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_db
 from app.deps import get_current_tier
-from app.models import TimelineEvent
 from app.schemas import HomeResponse, TimelineEventOut
 
 router = APIRouter(prefix="/api")
@@ -15,16 +11,19 @@ VENUE_NAME = "Shangri-La Tanjung Aru"
 VENUE_ADDRESS = "No. 20, Jalan Aru, Tanjung Aru, 88100 Kota Kinabalu, Sabah, Malaysia"
 VENUE_MAP_URL = "https://maps.app.goo.gl/Q2UqWTeGjsryFikd7"
 DRESS_CODE = "Formal — Soft florals and pastels welcome"
+
+TIMELINE = [
+    {"id": "evt-1", "starts_at": "10:00 AM", "title": "Arrival & Registration at the Pavilion", "description": "Grab a welcome drink, find your seat, and soak in the tropical breeze", "visibility": "full_only"},
+    {"id": "evt-2", "starts_at": "11:00 AM", "title": "Wedding Ceremony",             "description": "The moment we say 'I do'. Tissues recommended, happy tears only",             "visibility": "full_only"},
+    {"id": "evt-3", "starts_at": "12:30 PM", "title": "Cocktail Hour",                "description": "Mingle, clink glasses, and enjoy canapés while we sneak off for photos",             "visibility": "all"},
+    {"id": "evt-4", "starts_at": "2:00 PM",  "title": "Wedding Reception Dinner",     "description": "A sumptuous Chinese feast shared among good company",     "visibility": "all"},
+]
 # ────────────────────────────────────────────────────────────────────────────
 
 
 @router.get("/home", response_model=HomeResponse)
-async def home(tier: str = Depends(get_current_tier), db: AsyncSession = Depends(get_db)):
-    stmt = select(TimelineEvent).order_by(TimelineEvent.sort_order)
-    events = (await db.execute(stmt)).scalars().all()
-
-    if tier == "reception":
-        events = [e for e in events if e.visibility == "all"]
+async def home(tier: str = Depends(get_current_tier)):
+    events = TIMELINE if tier == "full" else [e for e in TIMELINE if e["visibility"] == "all"]
 
     return HomeResponse(
         tier=tier,
@@ -34,15 +33,7 @@ async def home(tier: str = Depends(get_current_tier), db: AsyncSession = Depends
         venue_map_url=VENUE_MAP_URL,
         dress_code=DRESS_CODE,
         timeline=[
-            TimelineEventOut(
-                id=e.id,
-                starts_at=e.starts_at,
-                title=e.title,
-                description=e.description,
-                location=e.location,
-                visibility=e.visibility,
-                sort_order=e.sort_order,
-            )
+            TimelineEventOut(id=e["id"], starts_at=e["starts_at"], title=e["title"], description=e["description"])
             for e in events
         ],
     )

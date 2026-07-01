@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from pydantic import BaseModel
 
 
@@ -17,13 +15,10 @@ class MeResponse(BaseModel):
 
 
 class TimelineEventOut(BaseModel):
-    id: UUID
+    id: str
     starts_at: str
     title: str
     description: str
-    location: str | None
-    visibility: str
-    sort_order: int
 
 
 class HomeResponse(BaseModel):

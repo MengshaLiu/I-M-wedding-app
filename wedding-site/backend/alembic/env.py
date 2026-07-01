@@ -6,7 +6,7 @@ from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.db import Base
-from app.models import GuestList, SiteContent, Table, TimelineEvent  # noqa: F401 — ensure models are registered
+from app.models import GuestList, Table  # noqa: F401 — ensure models are registered
 
 config = context.config
 if config.config_file_name is not None:
