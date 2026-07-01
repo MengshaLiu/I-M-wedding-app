@@ -3,18 +3,16 @@ import { cookies } from "next/headers";
 const API_URL = process.env.API_URL ?? "http://localhost:8000";
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
 
-// ─── colour tokens (mirrors the design file) ───────────────────────────────
 const C = {
-  deep: "oklch(36% .072 152)",       // headings, body text
-  sage: "oklch(55% .09 150)",        // accent green
-  muted: "oklch(0.5 0.04 150)",      // secondary text
-  line: "oklch(0.82 0.03 140)",      // divider lines
-  bg: "#f8f5e8",                     // warm cream
-  btnBg: "#59745B",                  // button fill
-  btnText: "oklch(0.985 0.012 110)", // button label
+  deep: "oklch(36% .072 152)",
+  sage: "oklch(55% .09 150)",
+  muted: "oklch(0.5 0.04 150)",
+  line: "oklch(0.82 0.03 140)",
+  bg: "#f8f5e8",
+  btnBg: "#59745B",
+  btnText: "oklch(0.985 0.012 110)",
 } as const;
 
-// ─── font vars ──────────────────────────────────────────────────────────────
 const F = {
   cormorant: "var(--font-cormorant), 'Cormorant Garamond', serif",
   greatVibes: "var(--font-great-vibes), 'Great Vibes', cursive",
@@ -33,7 +31,6 @@ async function getHomeData() {
   return res.json();
 }
 
-// ─── Shared divider ─────────────────────────────────────────────────────────
 function LeafDivider({ py = 48 }: { py?: number }) {
   return (
     <div style={{
@@ -43,14 +40,13 @@ function LeafDivider({ py = 48 }: { py?: number }) {
     }}>
       <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/wedding/watercolor-leaf.png" alt="" width={50} height={50}
+      <img src="/wedding/watercolor-leaf.png" alt="" width={44} height={44}
         style={{ objectFit: "contain", opacity: 0.85 }} />
       <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
     </div>
   );
 }
 
-// ─── Full-guest home (v3 design) ────────────────────────────────────────────
 function FullGuestHome({ data }: { data: Record<string, unknown> }) {
   const timeline = (data.timeline as Array<{
     id: string; starts_at: string; title: string; description: string;
@@ -64,13 +60,13 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
     }}>
 
       {/* ── Hero ── */}
-      <div style={{
-        width: "100%", maxWidth: 720, padding: "60px 24px 0",
+      <div className="hero-section" style={{
+        width: "100%", maxWidth: 720, padding: "60px 20px 0",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center", animation: "fadeInUp 1s ease-out",
       }}>
         <h1 style={{
-          fontFamily: F.greatVibes, fontSize: "clamp(56px, 10vw, 72px)",
+          fontFamily: F.greatVibes, fontSize: "clamp(48px, 13vw, 72px)",
           fontWeight: 400, margin: "0 0 10px", lineHeight: 1.1, marginTop: 20,
         }}>
           <span style={{ color: C.deep }}>Ivan</span>{" "}
@@ -79,14 +75,14 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
         </h1>
         <div style={{ width: "100%", marginTop: 4, animation: "fadeIn 1.2s ease-out 0.3s both" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wedding/hero.jpg" alt="Ivan and Mengsha" style={{
+          <img src="/wedding/hero.jpg" alt="Ivan and Mengsha" className="hero-img" style={{
             width: "100%", height: 440, display: "block",
             borderRadius: 10, objectFit: "cover", objectPosition: "top",
             backgroundColor: "#f5f0e8",
           }} />
         </div>
         <p style={{
-          fontFamily: F.dancing, fontSize: 28, color: C.sage,
+          fontFamily: F.dancing, fontSize: "clamp(22px, 6vw, 28px)", color: C.sage,
           margin: "8px 0 0",
         }}>
           are getting married
@@ -95,32 +91,32 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
 
       {/* ── Date ── */}
       <div style={{
-        width: "100%", maxWidth: 720, padding: "48px 24px 0",
+        width: "100%", maxWidth: 720, padding: "40px 24px 0",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center", animation: "fadeInUp 1s ease-out 0.5s both",
       }}>
         <p style={{
-          fontFamily: F.mulish, fontSize: 13, fontWeight: 500,
-          letterSpacing: "0.35em", textTransform: "uppercase",
+          fontFamily: F.mulish, fontSize: 12, fontWeight: 500,
+          letterSpacing: "0.3em", textTransform: "uppercase",
           color: C.muted, margin: "0 0 6px",
         }}>
           Saturday
         </p>
         <div style={{
-          display: "flex", alignItems: "center", gap: 20,
+          display: "flex", alignItems: "center", gap: 16,
           width: "100%", maxWidth: 400, justifyContent: "center",
         }}>
-          <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+          <div style={{ flex: 1, height: 1, backgroundColor: C.line, minWidth: 16 }} />
           <h2 style={{
-            fontFamily: F.cormorant, fontSize: "clamp(36px, 8vw, 48px)",
-            fontWeight: 400, color: C.deep, margin: 0, whiteSpace: "nowrap",
+            fontFamily: F.cormorant, fontSize: "clamp(28px, 8vw, 48px)",
+            fontWeight: 400, color: C.deep, margin: 0,
           }}>
             {String(data.date || "September 12, 2026").replace(", 2026", "")}
           </h2>
-          <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+          <div style={{ flex: 1, height: 1, backgroundColor: C.line, minWidth: 16 }} />
         </div>
         <p style={{
-          fontFamily: F.mulish, fontSize: 14, fontWeight: 500,
+          fontFamily: F.mulish, fontSize: 13, fontWeight: 500,
           letterSpacing: "0.35em", textTransform: "uppercase",
           color: C.muted, margin: "4px 0 0",
         }}>
@@ -128,15 +124,14 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
         </p>
       </div>
 
-      {/* ── Leaf divider ── */}
-      <LeafDivider py={40} />
+      <LeafDivider py={36} />
 
       {/* ── Venue card ── */}
-      <div style={{
-        width: "100%", maxWidth: 720, padding: "0 24px",
+      <div className="venue-wrap" style={{
+        width: "100%", maxWidth: 720, padding: "0 20px",
         animation: "fadeInUp 1s ease-out 0.7s both", position: "relative",
       }}>
-        <div style={{
+        <div className="venue-card" style={{
           position: "relative", borderRadius: 20, padding: "48px 40px",
           display: "flex", flexDirection: "column", alignItems: "center",
           textAlign: "center", overflow: "visible",
@@ -145,35 +140,37 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
         }}>
           {/* Left sprig */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wedding/watercolor-sprig-left.png" alt="" aria-hidden="true" style={{
-            position: "absolute", left: 0, top: 35,
-            transform: "translateY(-50%) rotate(-15deg)",
-            width: 120, height: "auto", opacity: 0.85, pointerEvents: "none",
-          }} />
+          <img src="/wedding/watercolor-sprig-left.png" alt="" aria-hidden="true"
+            className="sprig sprig-left" style={{
+              position: "absolute", left: -8, top: 40,
+              transform: "translateY(-50%) rotate(-15deg)",
+              width: 110, height: "auto", opacity: 0.8, pointerEvents: "none",
+            }} />
           {/* Right sprig */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/wedding/watercolor-sprig-right.png" alt="" aria-hidden="true" style={{
-            position: "absolute", right: -20, bottom: -80,
-            transform: "scaleX(-1) rotate(-15deg)",
-            width: 120, height: "auto", opacity: 0.85, pointerEvents: "none",
-          }} />
+          <img src="/wedding/watercolor-sprig-right.png" alt="" aria-hidden="true"
+            className="sprig sprig-right" style={{
+              position: "absolute", right: -8, bottom: -60,
+              transform: "scaleX(-1) rotate(-15deg)",
+              width: 110, height: "auto", opacity: 0.8, pointerEvents: "none",
+            }} />
 
-          <p style={{ fontFamily: F.dancing, fontSize: 24, color: C.sage, margin: "0 0 4px" }}>
+          <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>
             the celebration
           </p>
           <h3 style={{
-            fontFamily: F.cormorant, fontSize: 36, fontWeight: 500,
-            color: C.deep, margin: "0 0 16px",
+            fontFamily: F.cormorant, fontSize: "clamp(26px, 6vw, 36px)", fontWeight: 500,
+            color: C.deep, margin: "0 0 12px",
           }}>
             {String(data.venue_name || "Shangri-La Tanjung Aru")}
           </h3>
           <p style={{
-            fontFamily: F.mulish, fontSize: 15, color: C.muted,
-            margin: 0, lineHeight: 1.6,
+            fontFamily: F.mulish, fontSize: 14, color: C.muted,
+            margin: 0, lineHeight: 1.7,
           }}>
             {String(data.venue_address || "Kota Kinabalu, Sabah, Malaysia")}
           </p>
-          {data.venue_map_url && (
+          {!!data.venue_map_url && (
             <a
               href={String(data.venue_map_url)}
               target="_blank"
@@ -184,7 +181,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
                 letterSpacing: "0.25em", textTransform: "uppercase",
                 color: C.btnText, backgroundColor: C.btnBg,
                 padding: "12px 32px", textDecoration: "none",
-                borderRadius: 20, transition: "opacity 0.2s",
+                borderRadius: 20,
               }}
             >
               View Map
@@ -195,67 +192,65 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
 
       {/* ── Dress code ── */}
       <div style={{
-        width: "100%", maxWidth: 720, padding: "56px 24px 0",
+        width: "100%", maxWidth: 720, padding: "48px 24px 0",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center", animation: "fadeInUp 1s ease-out 0.9s both",
       }}>
         <p style={{
-          fontFamily: F.mulish, fontSize: 13, fontWeight: 500,
-          letterSpacing: "0.35em", textTransform: "uppercase",
+          fontFamily: F.mulish, fontSize: 12, fontWeight: 500,
+          letterSpacing: "0.3em", textTransform: "uppercase",
           color: C.muted, margin: "0 0 8px",
         }}>
           Dress Code
         </p>
         <h2 style={{
-          fontFamily: F.cormorant, fontSize: "clamp(32px, 7vw, 42px)",
-          fontWeight: 400, color: C.deep, margin: "0 0 16px",
+          fontFamily: F.cormorant, fontSize: "clamp(28px, 7vw, 42px)",
+          fontWeight: 400, color: C.deep, margin: "0 0 12px",
         }}>
           {String(data.dress_code || "Garden Formal")}
         </h2>
         <p style={{
-          fontFamily: F.mulish, fontSize: 15, color: C.muted,
-          maxWidth: 440, lineHeight: 1.7, margin: 0,
+          fontFamily: F.mulish, fontSize: 14, color: C.muted,
+          maxWidth: 380, lineHeight: 1.7, margin: 0,
         }}>
           Soft, elegant and earthy. Forest greens, light and warm neutrals are warmly encouraged.
         </p>
       </div>
 
-      {/* ── Leaf divider ── */}
-      <LeafDivider py={48} />
+      <LeafDivider py={44} />
 
       {/* ── Timeline ── */}
       <div style={{
-        width: "100%", maxWidth: 720, padding: "0 24px 20px",
+        width: "100%", maxWidth: 720, padding: "0 20px 20px",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center",
       }}>
         <h2 style={{
-          fontFamily: F.cormorant, fontSize: "clamp(32px, 7vw, 42px)",
-          fontWeight: 400, margin: "0 0 8px", color: C.deep,
+          fontFamily: F.cormorant, fontSize: "clamp(28px, 7vw, 42px)",
+          fontWeight: 400, margin: "0 0 6px", color: C.deep,
         }}>
           The Day
         </h2>
-        <p style={{ fontFamily: F.dancing, fontSize: 24, color: C.sage, margin: "0 0 48px" }}>
+        <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px, 5vw, 24px)", color: C.sage, margin: "0 0 40px" }}>
           a little timeline
         </p>
 
-        <div style={{ width: "100%", maxWidth: 600, position: "relative" }}>
-          {/* Centre line */}
-          <div style={{
-            position: "absolute", left: "50%", top: 0, bottom: 0,
-            width: 1.5, backgroundColor: C.line, transform: "translateX(-50%)",
+        {/* Desktop: 3-col alternating  |  Mobile: left-rail single col */}
+        <div className="tl-container" style={{ width: "100%", maxWidth: 560, position: "relative" }}>
+          {/* Centre line (desktop) / left rail (mobile) — toggled via CSS */}
+          <div className="tl-line" style={{
+            position: "absolute", top: 0, bottom: 0,
+            width: 1.5, backgroundColor: C.line,
           }} />
 
           {timeline.map((event, i) => {
             const isLeft = i % 2 === 0;
             const isLast = i === timeline.length - 1;
-            const pb = isLast ? 0 : 48;
-            const card = (
-              <div style={{
-                textAlign: isLeft ? "right" : "left",
-                padding: isLeft ? `0 20px ${pb}px 0` : `0 0 ${pb}px 20px`,
-              }}>
-                <p style={{
+            const pb = isLast ? 0 : 44;
+
+            const cardContent = (
+              <>
+                <p className="tl-time" style={{
                   fontFamily: F.mulish, fontSize: 11, fontWeight: 500,
                   letterSpacing: "0.25em", textTransform: "uppercase",
                   color: C.muted, margin: "0 0 4px",
@@ -263,8 +258,8 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
                   {event.starts_at}
                 </p>
                 <p style={{
-                  fontFamily: F.cormorant, fontSize: 26, fontWeight: 500,
-                  color: C.deep, margin: "0 0 6px",
+                  fontFamily: F.cormorant, fontSize: 24, fontWeight: 500,
+                  color: C.deep, margin: "0 0 4px",
                 }}>
                   {event.title}
                 </p>
@@ -274,24 +269,49 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
                 }}>
                   {event.description}
                 </p>
-              </div>
+              </>
             );
+
             const dot = (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", paddingTop: 2 }}>
+              <div className="tl-dot-wrap" style={{
+                display: "flex", justifyContent: "center",
+                alignItems: "flex-start", paddingTop: 2,
+              }}>
                 <div style={{
-                  width: 14, height: 14, borderRadius: "50%",
+                  width: 13, height: 13, borderRadius: "50%",
                   border: `2px solid ${C.sage}`, backgroundColor: C.bg,
                   position: "relative", zIndex: 1,
                 }} />
               </div>
             );
+
             return (
-              <div key={event.id} style={{
-                display: "grid", gridTemplateColumns: "1fr 48px 1fr",
+              <div key={event.id} className="tl-row" style={{
+                display: "grid", gridTemplateColumns: "1fr 40px 1fr",
               }}>
-                {isLeft ? card : <div />}
+                {/* Left cell: has card when isLeft=true */}
+                <div
+                  className={isLeft ? "tl-card tl-card-l" : "tl-empty"}
+                  style={isLeft ? {
+                    textAlign: "right",
+                    padding: `0 16px ${pb}px 0`,
+                  } : {}}
+                >
+                  {isLeft ? cardContent : null}
+                </div>
+
                 {dot}
-                {isLeft ? <div /> : card}
+
+                {/* Right cell: has card when isLeft=false */}
+                <div
+                  className={!isLeft ? "tl-card tl-card-r" : "tl-empty"}
+                  style={!isLeft ? {
+                    textAlign: "left",
+                    padding: `0 0 ${pb}px 16px`,
+                  } : {}}
+                >
+                  {!isLeft ? cardContent : null}
+                </div>
               </div>
             );
           })}
@@ -300,25 +320,27 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
 
       {/* ── Footer ── */}
       <div style={{
-        width: "100%", maxWidth: 720, padding: "64px 24px 48px",
+        width: "100%", maxWidth: 720, padding: "56px 24px 48px",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center",
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/wedding/watercolor-leaf.png" alt="" width={48} height={48}
-          style={{ objectFit: "contain", opacity: 0.85, marginBottom: 20 }} />
-        <p style={{ fontFamily: F.dancing, fontSize: 36, color: C.sage, margin: "0 0 8px" }}>
+        <img src="/wedding/watercolor-leaf.png" alt="" width={44} height={44}
+          style={{ objectFit: "contain", opacity: 0.85, marginBottom: 16 }} />
+        <p style={{
+          fontFamily: F.dancing, fontSize: "clamp(26px, 8vw, 36px)",
+          color: C.sage, margin: "0 0 8px",
+        }}>
           We can&apos;t wait to celebrate with you
         </p>
         <p style={{
-          fontFamily: F.mulish, fontSize: 12, letterSpacing: "0.2em",
+          fontFamily: F.mulish, fontSize: 11, letterSpacing: "0.2em",
           color: "oklch(0.6 0.03 150)", margin: 0,
         }}>
           SEPTEMBER 12, 2026
         </p>
       </div>
 
-      {/* Keyframe animations */}
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(24px); }
@@ -328,12 +350,57 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
+
+        /* ── Desktop: centre line sits in the middle ── */
+        .tl-line { left: 50%; transform: translateX(-50%); }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+          /* Hero */
+          .hero-section { padding-top: 32px !important; }
+          .hero-img { height: 260px !important; }
+
+          /* Venue card */
+          .venue-wrap { padding: 0 16px !important; }
+          .venue-card { padding: 36px 24px !important; }
+          .sprig { width: 72px !important; }
+          .sprig-left { left: -4px !important; top: 28px !important; }
+          .sprig-right { right: -4px !important; bottom: -40px !important; }
+
+          /* Timeline: switch to left-rail single column */
+          /* dot is 13px wide centred in a 22px column → centre at 11px; line is 1.5px → left = 11 - 0.75 = 10.25px */
+          .tl-line { left: 10px !important; transform: none !important; }
+
+          .tl-row {
+            grid-template-columns: 22px 1fr !important;
+            grid-template-rows: auto !important;
+          }
+
+          /* Always place dot in column 1, card in column 2 */
+          .tl-dot-wrap {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+          }
+
+          .tl-card {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            text-align: left !important;
+            padding-left: 14px !important;
+            padding-right: 0 !important;
+          }
+
+          /* Hide the empty placeholder cell */
+          .tl-empty { display: none !important; }
+
+          /* Left-side cards need bottom padding carried over */
+          .tl-card-l { padding-bottom: inherit; }
+        }
       `}</style>
     </div>
   );
 }
 
-// ─── Reception-guest home (simpler layout) ──────────────────────────────────
 function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
   const timeline = (data.timeline as Array<{
     id: string; starts_at: string; title: string; description: string;
@@ -352,8 +419,8 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
         <div className="text-sm text-gray-600 space-y-1.5">
           <p><span className="font-medium text-charcoal">Date</span> {String(data.date || "")}</p>
           <p><span className="font-medium text-charcoal">Venue</span> {String(data.venue_name || "")}</p>
-          {data.venue_address && <p className="text-gray-500 text-xs">{String(data.venue_address)}</p>}
-          {data.venue_map_url && (
+          {!!data.venue_address && <p className="text-gray-500 text-xs">{String(data.venue_address)}</p>}
+          {!!data.venue_map_url && (
             <a href={String(data.venue_map_url)} target="_blank" rel="noopener noreferrer"
               className="inline-block text-xs text-sage underline">
               Open in Maps →
@@ -382,7 +449,6 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
   );
 }
 
-// ─── Page entry ─────────────────────────────────────────────────────────────
 export default async function HomePage() {
   const data = await getHomeData();
 
