@@ -88,7 +88,7 @@ export default function SeatsPage() {
           fontFamily: F.cormorant, fontSize: "clamp(32px, 8vw, 48px)", fontWeight: 400,
           color: C.deep, margin: "0 0 10px", textAlign: "center",
         }}>
-          Find Your Seat
+          Find Your Seat for Wedding Banquet
         </h1>
         <p style={{
           fontFamily: F.mulish, fontSize: 13, color: C.muted,

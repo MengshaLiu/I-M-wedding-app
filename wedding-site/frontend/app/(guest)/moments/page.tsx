@@ -143,22 +143,20 @@ export default function MomentsPage() {
         )}
 
         <div className="photo-grid">
-          {photos.map(p => (
-            <div key={p.id} className="photo-card" onClick={() => setLightbox(p)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.thumb_url} alt={`Photo by ${p.uploader_name}`}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              <div className="photo-caption">
-                <p style={{ fontFamily: F.cormorant, fontSize: 15, fontWeight: 500, margin: "0 0 2px", color: "#fff" }}>
-                  {p.uploader_name}
-                </p>
-                {p.message && (
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", margin: 0,
-                    overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical" as const }}>
-                    {p.message}
-                  </p>
-                )}
+          {photos.map((p) => (
+            <div key={p.id} className="polaroid-wrap">
+              <div
+                className="photo-card"
+                onClick={() => setLightbox(p)}
+              >
+                <div className="card-img-wrap">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.thumb_url} alt={`Photo by ${p.uploader_name}`} className="card-img" />
+                </div>
+                <div className="photo-caption">
+                  <p className="caption-name">{p.uploader_name}</p>
+                  <p className="caption-msg">{p.message || " "}</p>
+                </div>
               </div>
             </div>
           ))}
@@ -305,27 +303,88 @@ export default function MomentsPage() {
         .photo-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 8px;
+          gap: 28px 20px;
+          padding: 8px 4px 24px;
+        }
+        .polaroid-wrap {
+          display: flex;
+          justify-content: center;
         }
         .photo-card {
           position: relative;
-          aspect-ratio: 1;
-          overflow: hidden;
-          border-radius: 10px;
           cursor: pointer;
-          background: rgba(255,255,255,0.3);
+          width: 100%;
+          background: #fdfaf0;
+          padding: 9px 9px 0;
+          border: 1px solid rgba(210,195,170,0.55);
+          box-shadow:
+            0 1px 2px rgba(60,45,30,0.06),
+            0 4px 10px rgba(60,45,30,0.08),
+            0 16px 36px rgba(60,45,30,0.10),
+            inset 0 1px 0 rgba(255,255,255,0.9);
+          transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
         }
-        .photo-card:hover .photo-caption { opacity: 1; }
+        .photo-card:hover {
+          transform: scale(1.04) translateY(-6px);
+          box-shadow:
+            0 2px 4px rgba(60,45,30,0.07),
+            0 10px 20px rgba(60,45,30,0.11),
+            0 32px 56px rgba(60,45,30,0.14),
+            inset 0 1px 0 rgba(255,255,255,0.9);
+          z-index: 20;
+        }
+        .card-img-wrap {
+          width: 100%;
+          aspect-ratio: 3/4;
+          overflow: hidden;
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+          background: #e8e0d0;
+        }
+        .card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          filter: contrast(1.03) saturate(0.88) brightness(1.01);
+        }
         .photo-caption {
-          position: absolute; bottom: 0; left: 0; right: 0;
-          background: linear-gradient(transparent, rgba(0,0,0,0.65));
-          padding: 20px 10px 10px;
-          opacity: 0;
-          transition: opacity 0.2s;
+          height: 54px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          padding: 0 6px;
+          text-align: center;
         }
-        @media (max-width: 480px) {
-          .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-          .photo-caption { opacity: 1; }
+        .caption-name {
+          font-family: var(--font-dancing, 'Dancing Script', cursive);
+          font-size: 15px;
+          font-weight: 600;
+          color: oklch(36% .072 152);
+          margin: 0;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 100%;
+        }
+        .caption-msg {
+          font-family: var(--font-mulish, 'Mulish', sans-serif);
+          font-size: 10px;
+          color: oklch(0.5 0.04 150);
+          margin: 0;
+          line-height: 1.35;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          width: 100%;
+          min-height: 13px;
+          opacity: 0.9;
+        }
+        @media (max-width: 540px) {
+          .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
         }
       `}</style>
     </div>
