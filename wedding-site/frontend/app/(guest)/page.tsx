@@ -145,6 +145,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
               position: "absolute", left: -8, top: 40,
               transform: "translateY(-50%) rotate(-15deg)",
               width: 110, height: "auto", opacity: 0.8, pointerEvents: "none",
+              mixBlendMode: "multiply",
             }} />
           {/* Right sprig */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,6 +154,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
               position: "absolute", right: -8, bottom: -60,
               transform: "scaleX(-1) rotate(-15deg)",
               width: 110, height: "auto", opacity: 0.8, pointerEvents: "none",
+              mixBlendMode: "multiply",
             }} />
 
           <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>
