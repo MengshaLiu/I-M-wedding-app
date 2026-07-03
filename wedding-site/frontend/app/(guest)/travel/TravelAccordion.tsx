@@ -32,6 +32,10 @@ const SECTION_META: Record<string, { label: string; intro: string }> = {
     label: "unwind",
     intro: "Ways to fill the days around the celebration.",
   },
+  "Where to Shop": {
+    label: "shop",
+    intro: "From handcrafted souvenirs to sea pearls — what to buy and where to find it.",
+  },
   "Before You Enter Malaysia": {
     label: "prepare",
     intro: "A few practical notes to smooth your arrival.",
