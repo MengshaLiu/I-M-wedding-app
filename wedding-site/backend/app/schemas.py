@@ -65,6 +65,7 @@ class TravelItem(BaseModel):
     name: str
     description: str
     tip: str | None = None
+    link: str | None = None
 
 
 class TravelSection(BaseModel):

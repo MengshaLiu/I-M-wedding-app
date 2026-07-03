@@ -44,7 +44,7 @@ const SECTION_META: Record<string, { label: string; intro: string }> = {
 
 const FALLBACK_LABELS = ["explore", "taste", "unwind", "prepare", "discover"];
 
-interface TravelItem { name: string; description: string; tip?: string | null; }
+interface TravelItem { name: string; description: string; tip?: string | null; link?: string | null; }
 interface TravelSection { title: string; items: TravelItem[]; }
 
 export function TravelAccordion({ sections }: { sections: TravelSection[] }) {
@@ -104,7 +104,7 @@ export function TravelAccordion({ sections }: { sections: TravelSection[] }) {
             <div style={{
               overflow: "hidden",
               transition: "max-height 0.45s ease, opacity 0.35s ease",
-              maxHeight: isOpen ? "2000px" : "0px",
+              maxHeight: isOpen ? "10000px" : "0px",
               opacity: isOpen ? 1 : 0,
             }}>
               <div style={{ padding: "4px 30px 34px" }}>
@@ -141,11 +141,31 @@ export function TravelAccordion({ sections }: { sections: TravelSection[] }) {
                     {item.tip && (
                       <p style={{
                         fontFamily: F.mulish, fontStyle: "italic", fontSize: 14,
-                        color: C.sage, margin: 0, paddingLeft: 14,
+                        color: C.sage, margin: item.link ? "0 0 10px" : "0", paddingLeft: 14,
                         borderLeft: `2px solid ${C.sage}`, lineHeight: 1.55,
                       }}>
                         {item.tip}
                       </p>
+                    )}
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: 5,
+                          fontFamily: F.mulish, fontSize: 12, fontWeight: 600,
+                          letterSpacing: "0.08em", textTransform: "uppercase",
+                          color: C.sage, textDecoration: "none",
+                          borderBottom: `1px solid oklch(0.75 0.07 150)`,
+                          paddingBottom: 1,
+                        }}
+                      >
+                        View on Google Maps
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </a>
                     )}
                   </div>
                 ))}

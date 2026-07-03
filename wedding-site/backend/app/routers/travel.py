@@ -39,40 +39,75 @@ TRAVEL_CONTENT = [
         ],
     ),
     TravelSection(
-        title="Places to Eat",
+        title="Things to Eat",
         items=[
             TravelItem(
                 name="Fook Yuen Cafe & Bakery",
                 description="A KK institution and the go-to kopitiam for locals and visitors alike, Fook Yuen on Gaya Street has been serving up honest, no-frills Malaysian breakfast since the early hours of the morning. The self-service setup is part of the charm — grab a table, order your drinks at the counter, and load up your tray with dim sum, noodles, and freshly baked goods from the spread. Open from 6am until late, it fits any hour of the day.",
                 tip="Don't leave without trying the Roti Kahwin — their house-baked bread toasted and slathered with kaya and butter — paired with a classic Teh C. Simple, cheap, and genuinely delicious.",
-            ),
-            TravelItem(
-                name="Suria Sabah Food Court",
-                description="Air-conditioned food court in the Suria Mall — great nasi lemak, laksa, and Sabahan staples.",
-                tip="Quiet after 2 PM if you want to avoid the lunch crowd.",
+                link="https://www.google.com/maps/place/Fook+Yuen+%7C+Gaya+Street/@5.9851393,116.0758101,17z/data=!3m1!4b1!4m5!3m4!1s0x323b6985ef29398b:0x999f83232d94e7ba!8m2!3d5.985134!4d116.0779988",
             ),
             TravelItem(
                 name="Kedai Kopi Jia Siang",
                 description="A long-standing kopitiam in Lintas that has become one of KK's most well-known spots for Sang Nyuk Mee — the beloved Sabah-style pork noodle that locals have been eating since the Jesselton days. Established since 1997, Jia Siang serves up bowls of tender pork slices, juicy handmade pork balls, and springy noodles in a rich, flavourful broth — available either in soup or dry kon lau style. A no-frills, satisfying meal that draws a steady crowd of regulars from morning through to the late hours.",
                 tip="Open until 2am — making it one of the best supper spots in KK after a night out. Order the Kon Lou Mee dry style and pair it with their signature chili sauce for the full experience.",
+                link="https://www.google.com/maps/?cid=13562141638734177505",
             ),
             TravelItem(
                 name="Kopitiam Asam Pedas (KAP)",
                 description="A beloved local seafood kopitiam that has earned a cult following in KK for its bold, fiery asam pedas — the distinctly Malaysian hot and sour broth that locals can't get enough of. Tucked inside Wisma Merdeka, the menu centres around fresh seafood prepared with vibrant, tangy flavours — from the signature Asam Pedas soup loaded with your choice of fish to stir-fried seafood noodles and hearty side dishes. Unpretentious, affordable, and always packed with locals.",
                 tip="The Asam Pedas soup is the star — order it with fresh fish and a bowl of steamed rice. Fair warning: it lives up to its name, so let them know if you prefer it less spicy.",
+                link="https://www.google.com/maps/search/Kopitiam+Asam+Pedas+KAP+Wisma+Merdeka+Kota+Kinabalu",
             ),
             TravelItem(
                 name="Sasa Seafood Restaurant",
                 description="A local seafood institution in Penampang, just a short drive from the city centre, Sasa has earned its reputation as one of KK's go-to spots for fresh, affordable seafood. Its name combines the first syllables of Sabah and Sarawak — a nod to its Borneo roots. The sprawling restaurant buzzes with locals most evenings, and the tanks of live seafood tell you everything about the freshness of what lands on your table. From buttery crabs and boiled prawns to steamed grouper and stir-fried jungle fern, the menu covers all the classics done well.",
                 tip="Air-conditioned rooms are available including a private room that fits up to 30 people — ideal for family dinners or group gatherings. Book ahead on weekends as it fills up fast.",
+                link="https://www.google.com/maps/search/Sasa+Seafood+Restaurant+Penampang+Kota+Kinabalu",
             ),
-          TravelItem(
+            TravelItem(
                 name="A1 Chicken Rice",
                 description="A KK homegrown success story that started as a humble food stall in Lintas in 2010 and has since grown into one of the most recognised chicken rice brands in Sabah. Founded by a dedicated couple with decades of culinary experience, A1 serves up tender roasted and poached chicken over fragrant rice — all made from their own home recipes using fresh local chicken. Pork-free and welcoming to all, it has become a firm favourite among locals and visitors alike, with multiple outlets across the city.",
                 tip="The signature Roasted Chicken Rice is the must-order — juicy, flavourful, and consistently good. The Honey Sesame Chicken is another crowd favourite worth trying if you want something a little different.",
+                link="https://www.google.com/maps/search/A1+Chicken+Rice+Lintas+Plaza+Kota+Kinabalu",
             ),
         ],
     ),
+     TravelSection(
+        title="Where to Shop",
+        items=[
+            TravelItem(
+                name="Imago Shopping Mall",
+                description="KK's most modern mall with over 300 stores across four levels — international brands, local fashion, a cinema, and a good food hall. Handy for last-minute essentials or an air-conditioned afternoon browse.",
+                tip="The basement supermarket stocks local snacks, Tenom coffee, and Sabah tea — perfect for edible souvenirs.",
+                link="https://www.google.com/maps/search/Imago+Shopping+Mall+KK+Times+Square+Kota+Kinabalu",
+            ),
+            TravelItem(
+                name="Wisma Merdeka",
+                description="One of KK's oldest waterfront malls, Wisma Merdeka is a haven for local stores — think homegrown boutiques, independent retailers, and specialty shops you won't find in any chain mall. Its relaxed, neighbourhood feel makes it a refreshing contrast to the city's newer commercial centres.",
+                tip="A good place for money changers in KK — rates here consistently beat the airport and hotel counters, so stock up on ringgit before heading out.",
+                link="https://www.google.com/maps/search/Wisma+Merdeka+Kota+Kinabalu",
+            ),
+            TravelItem(
+                name="Suria Sabah",
+                description="Suria Sabah sits right in the heart of the city near gaya street and spans multiple levels of retail, dining, and entertainment. A solid mix of international brands, local fashion labels, electronics, and lifestyle stores makes it the go-to destination for serious shopping — all under one roof with strong air-conditioning to escape the tropical heat.",
+                tip="A great one-stop destination — shop the many retail floors then refuel at the wide range of restaurants and eateries covering everything from local Sabahan flavours to international cuisines.",
+                link="https://www.google.com/maps/place/Suria+Sabah/@5.9867933,116.0775039,17z",
+            ),
+            TravelItem(
+                name="The Art Attic",
+                description="Tucked along Lorong Dewan just a short stroll from Gaya Street, The Art Attic is KK's most beloved arts and lifestyle concept space — part gallery, part gift shop, part creative workshop hub. Set across a spacious, chic industrial interior, it showcases a carefully curated collection of handmade crafts, paintings, jewellery, homeware, clothing, and fine art — all created by local Sabahan artists and designers. A refreshing alternative to souvenir shops, every piece here carries a genuine story.",
+                tip="There's a cosy café inside — grab a drink and take your time browsing the art without feeling rushed.",
+                link="https://www.google.com/maps/search/The+Art+Attic,+7+Lorong+Dewan,+Kota+Kinabalu",
+            ),
+            TravelItem(
+                name="Salt x Paper Stationery & Gifts",
+                description="A delightful stationery and gift boutique right on Jalan Gaya, Salt x Paper is a KK institution lovingly nicknamed 'stationery heaven' by locals. Founded by a creative couple with a passion for paper goods, the store is beautifully curated with designer notebooks, greeting cards, washi tape, stickers, postcards, and quirky collectibles — many featuring original illustrations by local Sabahan artists. Every corner is an aesthetic treat and dangerously easy to overspend in.",
+                link="https://www.google.com/maps/search/Salt+x+Paper,+51+Jalan+Gaya,+Kota+Kinabalu",
+            ),
+        ],
+    ),
+    
     TravelSection(
         title="Entertainment & Activities",
         items=[
@@ -95,36 +130,6 @@ TRAVEL_CONTENT = [
                 name="Spa & Massage",
                 description="After days of island hopping, jungle trekking, and exploring the city on foot, KK has no shortage of places to unwind. From budget-friendly reflexology centres tucked above shophouses to indulgent full-body treatments at resort spas, the city caters to every level of relaxation and budget. Traditional Malay massage, Thai massage, aromatherapy, and foot reflexology are all widely available — and remarkably affordable compared to most cities.",
                 tip="Attiya Spa KK and Natura Spa & Wellness KK are both highly recommended by locals and travellers alike.",
-            ),
-        ],
-    ),
-    TravelSection(
-        title="Where to Shop",
-        items=[
-            TravelItem(
-                name="Imago Shopping Mall",
-                description="KK's most modern mall with over 300 stores across four levels — international brands, local fashion, a cinema, and a good food hall. Handy for last-minute essentials or an air-conditioned afternoon browse.",
-                tip="The basement supermarket stocks local snacks, Tenom coffee, and Sabah tea — perfect for edible souvenirs.",
-            ),
-            TravelItem(
-                name="Wisma Merdeka",
-                description="One of KK's oldest waterfront malls, Wisma Merdeka is a haven for local stores — think homegrown boutiques, independent retailers, and specialty shops you won't find in any chain mall. Its relaxed, neighbourhood feel makes it a refreshing contrast to the city's newer commercial centres.",
-                tip="A good place for money changers in KK — rates here consistently beat the airport and hotel counters, so stock up on ringgit before heading out.",
-            ),
-            TravelItem(
-                name="Suria Sabah",
-                description="Suria Sabah sits right in the heart of the city near gaya street and spans multiple levels of retail, dining, and entertainment. A solid mix of international brands, local fashion labels, electronics, and lifestyle stores makes it the go-to destination for serious shopping — all under one roof with strong air-conditioning to escape the tropical heat.",
-                tip="A great one-stop destination — shop the many retail floors then refuel at the wide range of restaurants and eateries covering everything from local Sabahan flavours to international cuisines.",
-            ),  
-           TravelItem(
-                name="The Art Attic",
-                description="Tucked along Lorong Dewan just a short stroll from Gaya Street, The Art Attic is KK's most beloved arts and lifestyle concept space — part gallery, part gift shop, part creative workshop hub. Set across a spacious, chic industrial interior, it showcases a carefully curated collection of handmade crafts, paintings, jewellery, homeware, clothing, and fine art — all created by local Sabahan artists and designers. A refreshing alternative to souvenir shops, every piece here carries a genuine story.",
-                tip="There's a cosy café inside — grab a drink and take your time browsing the art without feeling rushed. A perfect afternoon stop between Gaya Street and the waterfront.",
-            ),
-            TravelItem(
-                name="Salt x Paper Stationery & Gifts",
-                description="A delightful stationery and gift boutique right on Jalan Gaya, Salt x Paper is a KK institution lovingly nicknamed 'stationery heaven' by locals. Founded by a creative couple with a passion for paper goods, the store is beautifully curated with designer notebooks, greeting cards, washi tape, stickers, postcards, and quirky collectibles — many featuring original illustrations by local Sabahan artists. Every corner is an aesthetic treat and dangerously easy to overspend in.",
-                tip="Their own Salt x Paper label makes for a truly unique souvenir — postcards and notebooks you won't find anywhere else in the world.",
             ),
         ],
     ),
