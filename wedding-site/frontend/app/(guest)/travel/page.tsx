@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { TravelAccordion } from "./TravelAccordion";
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000";
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
@@ -14,6 +15,7 @@ const C = {
 
 const F = {
   cormorant: "var(--font-cormorant), 'Cormorant Garamond', serif",
+  greatVibes: "var(--font-great-vibes), 'Great Vibes', cursive",
   mulish: "var(--font-mulish), 'Mulish', sans-serif",
   dancing: "var(--font-dancing), 'Dancing Script', cursive",
 } as const;
@@ -34,12 +36,6 @@ async function getTravelData(): Promise<TravelSection[] | null> {
   return data.sections ?? [];
 }
 
-const SECTION_ICONS: Record<string, string> = {
-  "Places to Visit": "🌿",
-  "Places to Eat": "🍜",
-  "Before You Enter Malaysia": "✈️",
-};
-
 export default async function TravelPage() {
   const sections = await getTravelData();
   if (!sections) redirect("/");
@@ -47,78 +43,80 @@ export default async function TravelPage() {
   return (
     <div style={{
       minHeight: "calc(100vh - 53px)", backgroundColor: C.bg,
-      fontFamily: F.mulish, color: C.deep, overflowX: "hidden",
+      fontFamily: F.mulish, color: C.deep,
+      overflowX: "hidden", paddingBottom: 40,
     }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "52px 20px 72px" }}>
 
-        {/* ── Header ── */}
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px,5vw,24px)", color: C.sage, margin: "0 0 4px" }}>
-            Explore Kota Kinabalu
-          </p>
-          <h1 style={{
-            fontFamily: F.cormorant, fontSize: "clamp(36px,8vw,56px)",
-            fontWeight: 400, color: C.deep, margin: "0 0 16px",
-          }}>
-            Travel Guide
-          </h1>
-          <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, maxWidth: 440, margin: "0 auto" }}>
-            A little guide to help you make the most of your time in Sabah, Malaysia.
-            We can&apos;t wait to show you this part of the world.
-          </p>
-          <div style={{ width: "100%", maxWidth: 260, margin: "32px auto 0",
-            display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wedding/watercolor-leaf.png" alt="" width={36} height={36}
-              style={{ objectFit: "contain", opacity: 0.8 }} />
-            <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-          </div>
-        </div>
-
-        {/* ── Sections ── */}
-        {sections.map((section, si) => (
-          <div key={si} style={{ marginBottom: si < sections.length - 1 ? 56 : 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-              <span style={{ fontSize: 22 }}>{SECTION_ICONS[section.title] ?? "📍"}</span>
-              <h2 style={{
-                fontFamily: F.cormorant, fontSize: "clamp(24px,5vw,32px)",
-                fontWeight: 400, color: C.deep, margin: 0,
-              }}>
-                {section.title}
-              </h2>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {section.items.map((item, ii) => (
-                <div key={ii} style={{
-                  backgroundColor: "rgba(255,255,255,0.65)",
-                  border: `1px solid ${C.line}`,
-                  borderRadius: 16, padding: "20px 22px",
-                }}>
-                  <h3 style={{
-                    fontFamily: F.cormorant, fontSize: 22, fontWeight: 500,
-                    color: C.deep, margin: "0 0 6px",
-                  }}>
-                    {item.name}
-                  </h3>
-                  <p style={{ fontSize: 13, color: C.muted, margin: "0 0 8px", lineHeight: 1.65 }}>
-                    {item.description}
-                  </p>
-                  {item.tip && (
-                    <p style={{
-                      fontSize: 12, color: C.sage, margin: 0, lineHeight: 1.5,
-                      borderLeft: `2px solid ${C.sage}`, paddingLeft: 10,
-                    }}>
-                      💡 {item.tip}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* ── Header ── */}
+      <div style={{
+        width: "100%", maxWidth: 720, margin: "0 auto",
+        padding: "72px 24px 0",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        textAlign: "center",
+        animation: "fadeInUp 1s ease-out",
+      }}>
+        <p style={{
+          fontFamily: F.dancing, fontSize: "clamp(22px, 5vw, 30px)",
+          color: C.sage, margin: "0 0 2px",
+        }}>
+          Explore Kota Kinabalu
+        </p>
+        <h1 style={{
+          fontFamily: F.cormorant, fontSize: "clamp(48px, 10vw, 68px)",
+          fontWeight: 600, color: C.deep, margin: 0, lineHeight: 1.05,
+        }}>
+          Travel Guide
+        </h1>
+        <p style={{
+          fontFamily: F.mulish, fontSize: 16, color: C.muted,
+          maxWidth: 460, lineHeight: 1.7, margin: "24px 0 0",
+        }}>
+          A little guide to help you make the most of your time in Sabah, Malaysia.{" "}
+          We can&apos;t wait to show you this part of the world.
+        </p>
       </div>
+
+      {/* ── Leaf divider ── */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 14,
+        width: "100%", maxWidth: 300, padding: "40px 24px 44px",
+        justifyContent: "center", margin: "0 auto",
+      }}>
+        <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/wedding/watercolor-leaf.png" alt=""
+          width={50} height={50}
+          style={{ objectFit: "contain", opacity: 0.75, marginBottom: 14 }}
+        />
+        <div style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+      </div>
+
+      {/* ── Accordion cards ── */}
+      <div style={{ width: "100%", maxWidth: 720, margin: "0 auto", padding: "0 20px" }}>
+        <TravelAccordion sections={sections} />
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{
+        width: "100%", maxWidth: 720, margin: "0 auto",
+        padding: "64px 24px 24px",
+        display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/wedding/watercolor-leaf.png" alt=""
+          width={50} height={50}
+          style={{ objectFit: "contain", opacity: 0.75, marginBottom: 14 }}
+        />
+        <p style={{
+          fontFamily: F.greatVibes, fontSize: "clamp(34px, 8vw, 44px)",
+          color: "oklch(0.42 0.08 150)", margin: 0,
+        }}>
+          See you in Sabah
+        </p>
+      </div>
+
     </div>
   );
 }

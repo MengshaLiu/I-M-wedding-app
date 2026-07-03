@@ -31,7 +31,7 @@ TRAVEL_CONTENT = [
                 tip="Take the 8 AM ferry for the calmest seas and the best coral visibility.",
             ),
             TravelItem(
-                name="Gaya Street Sunday Market",
+                name="Gaya Street Market",
                 description="A lively Sunday morning bazaar with local produce, handicrafts, and Sabah street food stretching the length of the street.",
                 tip="Go early — it winds down by 1 PM.",
             ),
@@ -68,6 +68,31 @@ TRAVEL_CONTENT = [
         ],
     ),
     TravelSection(
+        title="Entertainment & Activities",
+        items=[
+            TravelItem(
+                name="Island Hopping & Snorkelling",
+                description="Hop between the five islands of Tunku Abdul Rahman Marine Park — white sand, coral reefs, and clear turquoise water just a short boat ride from the city.",
+                tip="Book a half-day boat from Jesselton Point. Manukan and Sapi are the easiest for a first visit.",
+            ),
+            TravelItem(
+                name="Sunset at Tanjung Aru",
+                description="The west-facing beach at Tanjung Aru serves up some of the most celebrated sunsets in all of Malaysia. Our venue sits right on this stretch.",
+                tip="Come early for a beach walk before the sky turns — it peaks fast.",
+            ),
+            TravelItem(
+                name="Mari Mari Cultural Village",
+                description="A living open-air museum where guides from Sabah's indigenous communities demonstrate traditional food, music, dance, and blowpipe skills.",
+                tip="The afternoon session ends with a lively cultural show — worth timing your visit around it.",
+            ),
+            TravelItem(
+                name="Bongawan River Cruise — Proboscis Monkey & Fireflies Mangrove",
+                description="A full-day cruise through Bongawan's mangrove wetlands, about 1.5 hours from KK. Spot proboscis monkeys feeding at the riverbanks in the afternoon, catch the Sky Mirror sunset at Bongawan Beach, then drift back through the mangroves as fireflies light up the trees like strings of fairy lights.",
+                tip="Book early — spots fill fast and the experience runs rain or shine. Afternoon tea and dinner are usually included in package tours.",
+            ),
+        ],
+    ),
+    TravelSection(
         title="Before You Enter Malaysia",
         items=[
             TravelItem(
@@ -81,19 +106,19 @@ TRAVEL_CONTENT = [
                 tip="Check your expiry date well before you book travel.",
             ),
             TravelItem(
-                name="Visa Requirements",
-                description="Many nationalities (AU, NZ, UK, US, EU, most ASEAN) receive 30–90 days visa-free. Check Immigration Malaysia's website for your passport.",
-                tip="Not legal advice — always verify with the official source or your embassy.",
+                name="Currency & Payments",
+                description="The currency is the Malaysian Ringgit (MYR). Cards are widely accepted in malls and hotels; carry some cash for markets and local eateries.",
+                tip="ATMs and currency exchange are available in KK city. Inform your bank before travel to avoid card blocks.",
             ),
             TravelItem(
-                name="Customs Allowance",
-                description="Duty-free: 1 litre of alcohol, 200 cigarettes or 225 g tobacco. Strict drug laws apply — declare anything over your allowance.",
-                tip="Alcohol availability varies in Sabah — consider stocking up duty-free at the international airport.",
+                name="Connectivity — SIM & eSIM",
+                description="Local SIM cards are cheap and widely available at Kota Kinabalu International Airport on arrival. Major providers (Maxis, Celcom, Digi) offer prepaid tourist plans with generous data. If you prefer, grab an eSIM before you fly so you're connected the moment you land.",
+                tip="An eSIM from Airalo or Holafly is the easiest option — activate it on the plane and skip the queue at the airport. Or set up international roaming with your home carrier before you fly if you'd rather keep your existing number.",
             ),
             TravelItem(
-                name="Currency",
-                description="Malaysian Ringgit (MYR). Cards are widely accepted in KK city; smaller eateries and markets are cash-only.",
-                tip="ATMs are plentiful in KK. Inform your bank before travel to avoid card blocks.",
+                name="Getting Around — Download Grab",
+                description="Grab is the go-to ride-hailing app across KK and all of Malaysia. Set it up before you land for easy, cashless travel from the airport and around the city. Grab Food is also great for ordering takeaway delivered straight to your hotel room.",
+                tip="Add a card or top up GrabPay in the app before you arrive — it's faster than paying cash per ride and works seamlessly for food delivery too.",
             ),
         ],
     ),
