@@ -79,23 +79,61 @@ export default async function GuestLayout({ children }: { children: React.ReactN
     );
   }
 
-  // Reception guest layout
+  // Reception guest layout — Chinese red theme
+  const receptionLinks = [
+    { label: "Home", chinese: "首页", href: "/" },
+    { label: "Moments", chinese: "美好瞬间", href: "/moments" },
+    { label: "Seat Finder", chinese: "座位查询", href: "/seats" },
+  ];
+  const RC = {
+    red: "#b23a2b",
+    cream: "#faf2e0",
+    line: "#e3cf9f",
+    bg: "#faf2e0",
+  } as const;
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-white border-b border-blush shadow-sm sticky top-0 z-10">
-        <nav className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="font-serif text-lg text-charcoal tracking-wide">
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: RC.bg }}>
+      <header style={{ backgroundColor: RC.red, position: "sticky", top: 0, zIndex: 10 }}>
+        <nav style={{
+          maxWidth: 720, margin: "0 auto", padding: "14px 20px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <Link href="/" style={{
+            fontFamily: F.cormorant,
+            fontSize: 22, fontWeight: 500,
+            color: RC.cream, textDecoration: "none",
+            letterSpacing: "0.05em",
+          }}>
             I &amp; M
           </Link>
-          <div className="flex gap-5 text-sm">
-            <Link href="/" className="hover:text-sage transition-colors">Home</Link>
-            <Link href="/moments" className="hover:text-sage transition-colors">Moments</Link>
-            <Link href="/seats" className="hover:text-sage transition-colors">Seat Finder</Link>
+          <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
+            {receptionLinks.map(({ label, chinese, href }) => (
+              <Link key={label} href={href} className="nav-link-reception" style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                textDecoration: "none", whiteSpace: "nowrap",
+              }}>
+                <span style={{
+                  fontFamily: F.mulish,
+                  fontSize: 10, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: RC.line,
+                }}>
+                  {label}
+                </span>
+                <span style={{
+                  fontFamily: "'PingFang SC', 'Microsoft YaHei', sans-serif",
+                  fontSize: 9, color: RC.line, opacity: 0.8, letterSpacing: "0.05em",
+                }}>
+                  {chinese}
+                </span>
+              </Link>
+            ))}
           </div>
         </nav>
+        <style>{`.nav-link-reception:hover { color: ${RC.cream} !important; }`}</style>
       </header>
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">{children}</main>
-      <footer className="text-center text-xs text-gray-400 py-6">Made with love ♡</footer>
+      <main style={{ flex: 1 }}>{children}</main>
     </div>
   );
 }
