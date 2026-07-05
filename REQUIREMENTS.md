@@ -130,8 +130,13 @@ You cannot run or test the public site without these. Keep it minimal but real.
   password or a small admin-only credential). The public-side "no login" rule
   does **not** apply to admins.
 - **F-5.2** Manage the **two invitation links** (one per tier): view each link,
-  **rotate** its code if needed (§R-2.5), and get a **QR code** for each of the
-  two links for printed invitations. *(No per-guest links.)*
+  **rotate** its code if needed (§R-2.5), and **download a QR code** for each
+  link for printing on physical invitations.
+  - Exactly **two QR codes**: one for the Full Guest link, one for the
+    Reception Guest link. Both encode the full `https://<site>/i/<code>` URL.
+  - QR codes are generated on-demand by the admin panel and downloadable as PNG.
+  - *(No per-guest links or per-guest QR codes — the link identifies the tier,
+    not the individual.)*
 - **F-5.2b** Manage the **guest list** used by the seat finder: add/edit guest
   name and **table** assignment. Optionally note which tier each guest belongs
   to so the couple knows which of the two links to send them — this is a record

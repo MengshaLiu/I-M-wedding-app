@@ -139,7 +139,7 @@ export default function MomentsPageReception() {
           letterSpacing: "0.25em", textTransform: "uppercase",
           color: C.btnText, backgroundColor: C.btnBg,
           padding: "12px 36px", border: "none", cursor: "pointer",
-          borderRadius: 24, marginBottom: 48,
+          borderRadius: 24, marginBottom: 48, margin: "0 auto 48px",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
         }}>
           <span>+ Share a Photo</span>

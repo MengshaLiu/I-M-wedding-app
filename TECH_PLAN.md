@@ -171,7 +171,11 @@ admins
 
 **Admin (admin auth required):**
 - `POST /api/admin/login`
-- CRUD `/api/admin/guests` (+ `POST …/{id}/token`, `…/export`, QR)
+- CRUD `/api/admin/guests` (+ `POST …/{id}/token`, `…/export`)
+- `GET  /api/admin/invite-links` → `{full: {url, token}, reception: {url, token}}`
+- `GET  /api/admin/invite-links/qr?tier=full|reception` → PNG QR code image
+  (encodes the full `https://<site>/i/<token>` URL; generated server-side with
+  `qrcode` library, returned as `image/png`)
 - CRUD `/api/admin/tables`, `/api/admin/events`, `/api/admin/content`
 - `PATCH /api/admin/photos/{id}` (hide/approve), `DELETE …`
 
@@ -287,15 +291,17 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
 ### Sprint 6 — Admin, polish, launch
 - **Goal:** Couple can run everything; production-ready.
 - **Tasks:** Admin login; guest CRUD + tier/table assignment; token
-  generate/revoke; **invite-link CSV export + per-guest QR**; table editors;
+  generate/revoke; **two downloadable QR codes** (Full Guest link + Reception
+  Guest link, PNG, via `GET /api/admin/invite-links/qr?tier=…`); table editors;
   travel-guide content editor (`site_content travel_*` keys); gallery moderation
   UI; `noindex`, SEO/OG basics, error pages, loading states, accessibility pass;
   production deploy + custom domain; warm-up ping for event window; content
   population; end-to-end test of both tiers.
   *(Timeline events and venue/dress-code details are code-managed in `home.py`
-  — no admin UI needed for those.)*
-- **DoD:** Couple adds a guest, generates a link, prints a QR, and the guest
-  reaches the correct tiered experience — all without developer help.
+  — no admin UI needed for those. No per-guest QR codes — one QR per tier only.)*
+- **DoD:** Couple views both invite links in the admin panel, downloads each as
+  a QR code PNG ready to print, rotates a code if needed, and both tiers reach
+  the correct experience — all without developer help.
 
 ---
 
