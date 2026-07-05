@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import gallery, health, home, me, seats, session, travel
+from app.routers import admin, gallery, health, home, me, seats, session, travel
 from app.services import storage
 
 
@@ -30,3 +30,4 @@ app.include_router(home.router)
 app.include_router(seats.router)
 app.include_router(gallery.router)
 app.include_router(travel.router)
+app.include_router(admin.router)

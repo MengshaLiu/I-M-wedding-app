@@ -55,3 +55,12 @@ def upload(key: str, data: bytes, content_type: str) -> None:
 
 def public_url(key: str) -> str:
     return f"{settings.minio_public_url}/{settings.minio_bucket}/{key}"
+
+
+def delete_objects(keys: list[str]) -> None:
+    if not keys:
+        return
+    _get_s3().delete_objects(
+        Bucket=settings.minio_bucket,
+        Delete={"Objects": [{"Key": k} for k in keys], "Quiet": True},
+    )

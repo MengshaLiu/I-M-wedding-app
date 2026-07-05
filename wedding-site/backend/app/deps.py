@@ -27,3 +27,15 @@ def require_full_tier(tier: str = Depends(get_current_tier)) -> str:
     if tier != "full":
         raise HTTPException(status_code=403, detail="Full guests only")
     return tier
+
+
+async def require_admin(req: Request) -> dict:
+    """Verify admin JWT from Authorization Bearer header."""
+    token = _extract_bearer(req)
+    try:
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired admin session")
+    if not payload.get("admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return payload
