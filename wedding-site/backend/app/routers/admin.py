@@ -24,6 +24,8 @@ from app.schemas import (
     AdminLoginResponse,
     AdminPhotoOut,
     GuestCreate,
+    GuestImportItem,
+    GuestImportResult,
     GuestOut,
     GuestUpdate,
     InviteLinkInfo,
@@ -226,6 +228,59 @@ async def delete_guest(
 
     await db.delete(guest)
     await db.commit()
+
+
+@router.post("/guests/import", response_model=GuestImportResult)
+async def import_guests(
+    items: list[GuestImportItem],
+    db: AsyncSession = Depends(get_db),
+    _admin: dict = Depends(require_admin),
+):
+    # Pre-load tables for label→id lookup (case-insensitive)
+    all_tables = (await db.execute(select(Table))).scalars().all()
+    table_by_label = {t.label.strip().lower(): t.id for t in all_tables}
+
+    # Pre-load existing guest names to detect duplicates
+    existing_names = {
+        g.name.strip().lower()
+        for g in (await db.execute(select(GuestList))).scalars().all()
+    }
+
+    created = 0
+    skipped = 0
+    errors: list[str] = []
+
+    for idx, item in enumerate(items, start=1):
+        name = item.name.strip()
+        display = item.display_name.strip()
+        if not name or not display:
+            errors.append(f"Row {idx}: name and display_name are required.")
+            skipped += 1
+            continue
+
+        if item.tier not in ("full", "reception"):
+            errors.append(f"Row {idx} ({name}): tier must be 'full' or 'reception', got '{item.tier}'.")
+            skipped += 1
+            continue
+
+        if name.lower() in existing_names:
+            errors.append(f"Row {idx}: '{name}' already exists — skipped.")
+            skipped += 1
+            continue
+
+        table_id = None
+        if item.table_label:
+            table_id = table_by_label.get(item.table_label.strip().lower())
+            if table_id is None:
+                errors.append(f"Row {idx} ({name}): table '{item.table_label}' not found — guest created without table assignment.")
+
+        guest = GuestList(name=name, display_name=display, tier=item.tier, table_id=table_id)
+        db.add(guest)
+        existing_names.add(name.lower())
+        created += 1
+
+    await db.commit()
+    return GuestImportResult(created=created, skipped=skipped, errors=errors)
 
 
 @router.get("/guests/export")

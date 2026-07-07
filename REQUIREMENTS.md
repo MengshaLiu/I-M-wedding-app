@@ -142,15 +142,28 @@ You cannot run or test the public site without these. Keep it minimal but real.
   - QR codes are generated on-demand by the admin panel and downloadable as PNG.
   - *(No per-guest links or per-guest QR codes — the link identifies the tier,
     not the individual.)*
-- **F-5.2b** Manage the **guest list** used by the seat finder: add/edit guest
-  name and **table** assignment. Optionally note which tier each guest belongs
-  to so the couple knows which of the two links to send them — this is a record
-  for the couple, it does not affect access.
+- **F-5.2b** Manage the **guest list and tables** in a unified **Guests & Tables**
+  panel:
+  - **Guest List view**: searchable table of all guests (name, display name, tier,
+    table assignment) with inline add/edit/delete.
+  - **By Table view**: guests grouped under their assigned table card; unassigned
+    guests shown in a separate section. Tables can be added, edited, and deleted
+    from the same view.
+  - **Live search**: filters guests by name in real time across both views.
+  - **CSV import**: upload a `.csv` file to bulk-create guests. A preview table
+    shows each parsed row with a per-row ✓ OK / ⚠ error status before committing.
+    Valid rows are imported; invalid rows (missing name, unknown tier, intra-file
+    duplicates) are skipped and reported. Guests whose names already exist in the
+    database are skipped automatically.
+    - Expected CSV columns: `name`, `display_name`, `tier` (full / reception,
+      defaults to `full`), `table` (optional — matched case-insensitively to an
+      existing table label).
+  - **CSV export**: download the full guest list as a `.csv` file.
 - **F-5.3** Wedding date, venue details, dress code, and timeline events are
   **code-managed** — edit `backend/app/routers/home.py` and redeploy to update
   them. The admin UI manages **travel-guide content** and **gallery moderation**
   only.
-- **F-5.4** Manage **tables** and seat assignments.
+- **F-5.4** Table management is integrated into the Guests & Tables panel (§F-5.2b).
 - **F-5.5** **Moderate** the gallery (hide/delete; approve if pre-approval mode).
 - **F-5.5b** **Download** photo originals from the gallery moderation UI:
   - Individual photo: "⬇ Original" link on each card.

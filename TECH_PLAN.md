@@ -172,13 +172,18 @@ admins
 
 **Admin (admin auth required):**
 - `POST /api/admin/login`
-- CRUD `/api/admin/guests` (+ `POST …/{id}/token`, `…/export`)
+- CRUD `/api/admin/guests` (+ `GET …/export`, `POST …/import`)
+  - `GET  /api/admin/guests/export` → CSV download of full guest list
+  - `POST /api/admin/guests/import` → body `[{name, display_name, tier, table_label?}]`;
+    pre-loads tables for label→id resolution; skips duplicates and invalid rows;
+    returns `{created, skipped, errors[]}`
 - `GET  /api/admin/invite-links` → `{full: {url, token}, reception: {url, token}}`
 - `GET  /api/admin/invite-links/qr?tier=full|reception` → PNG QR code image
   (encodes the full `https://<site>/i/<token>` URL; generated server-side with
   `qrcode` library, returned as `image/png`)
 - CRUD `/api/admin/tables`, `/api/admin/events`, `/api/admin/content`
 - `PATCH /api/admin/photos/{id}` (hide/approve), `DELETE …`
+- `GET  /api/admin/photos/download-zip?ids=...` → streaming ZIP of original photos
 
 **Access-control dependencies (the core):**
 ```python
@@ -327,9 +332,27 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
     sequentially over `POST /api/moments`. Applied to both `MomentsPageFull`
     and `MomentsPageReception`. Object URLs properly revoked on modal close /
     photo removal to prevent memory leaks.
+  - **Unified Guests & Tables panel** — Merged the separate Guests and Tables
+    admin tabs into a single "Guests & Tables" tab. Features:
+    - Toggle between **Guest List** view (searchable flat table) and **By Table**
+      view (guests grouped under their table card, "Unassigned" section at bottom).
+    - **Live search** filters guests by name across both views in real time.
+    - Guest and table add/edit/delete forms remain inline; opening one form
+      dismisses the other.
+    - Forms are rendered as inline JSX (not as component variables inside render)
+      to avoid the React remount-on-keystroke focus bug.
+  - **CSV guest import** — "Import CSV" button in the Guests & Tables toolbar
+    opens a modal with a drag-and-drop file zone. The browser reads the `.csv`
+    file as UTF-8 text and parses it natively (no external library). A preview
+    table shows all rows with per-row validation status before import. Valid rows
+    are sent to `POST /api/admin/guests/import`; a results screen reports how many
+    guests were created, skipped, or had warnings. Only `.csv` is supported (users
+    are prompted to use *File → Save As → CSV UTF-8* from Excel).
 - **DoD:** Guest can select multiple photos in one picker interaction, see
   previews before submitting, remove individual photos, and see upload progress;
-  all photos appear in the gallery after a successful batch upload.
+  all photos appear in the gallery after a successful batch upload. Admin can
+  import a guest list from CSV with preview and per-row error reporting, and can
+  view/manage guests and tables in a single unified panel.
 
 ---
 

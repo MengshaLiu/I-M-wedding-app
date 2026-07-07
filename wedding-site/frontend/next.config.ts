@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const config: NextConfig = {
+  transpilePackages: ["xlsx"],
   // Disable exposing X-Powered-By header
   poweredByHeader: false,
   // Disallow search engine indexing

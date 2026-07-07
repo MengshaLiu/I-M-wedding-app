@@ -126,6 +126,19 @@ class PhotoStatusUpdate(BaseModel):
     status: str  # "visible" | "hidden"
 
 
+class GuestImportItem(BaseModel):
+    name: str
+    display_name: str
+    tier: str = "full"
+    table_label: str | None = None
+
+
+class GuestImportResult(BaseModel):
+    created: int
+    skipped: int
+    errors: list[str]
+
+
 class InviteLinkInfo(BaseModel):
     url: str
     token: str
