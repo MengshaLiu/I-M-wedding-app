@@ -92,7 +92,7 @@ TRAVEL_CONTENT = [
                 name="Suria Sabah",
                 description="Suria Sabah sits right in the heart of the city near gaya street and spans multiple levels of retail, dining, and entertainment. A solid mix of international brands, local fashion labels, electronics, and lifestyle stores makes it the go-to destination for serious shopping — all under one roof with strong air-conditioning to escape the tropical heat.",
                 tip="A great one-stop destination — shop the many retail floors then refuel at the wide range of restaurants and eateries covering everything from local Sabahan flavours to international cuisines.",
-                link="https://www.google.com/maps/place/Suria+Sabah/@5.9867933,116.0775039,17z",
+                link="https://www.google.com/maps/search/Suria+Sabah",
             ),
             TravelItem(
                 name="The Art Attic",
