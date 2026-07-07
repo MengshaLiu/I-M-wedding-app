@@ -41,6 +41,7 @@ class Photo(Base):
     message: Mapped[str | None] = mapped_column(Text)
     storage_key: Mapped[str] = mapped_column(Text, nullable=False)
     thumb_key: Mapped[str] = mapped_column(Text, nullable=False)
+    original_key: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(PhotoStatusEnum, nullable=False, server_default="visible")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default="now()"

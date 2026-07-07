@@ -57,6 +57,11 @@ def public_url(key: str) -> str:
     return f"{settings.minio_public_url}/{settings.minio_bucket}/{key}"
 
 
+def download(key: str) -> bytes:
+    resp = _get_s3().get_object(Bucket=settings.minio_bucket, Key=key)
+    return resp["Body"].read()
+
+
 def delete_objects(keys: list[str]) -> None:
     if not keys:
         return

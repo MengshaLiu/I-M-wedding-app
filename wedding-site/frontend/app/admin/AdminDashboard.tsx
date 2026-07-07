@@ -27,6 +27,7 @@ interface Photo {
   message: string | null;
   url: string;
   thumb_url: string;
+  original_url: string | null;
   status: "visible" | "hidden";
   created_at: string;
 }
@@ -491,14 +492,16 @@ function TablesTab({ onTablesChange }: { onTablesChange: (tables: Table[]) => vo
 
 function PhotosTab() {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [zipping, setZipping] = useState(false);
   const [filter, setFilter] = useState<"all" | "visible" | "hidden">("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const loadPhotos = useCallback(() => {
     setLoading(true);
     apiFetch("/api/admin/photos")
       .then(r => r.json())
-      .then(setPhotos)
+      .then((data: Photo[]) => { setPhotos(data); setSelected(new Set()); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -520,12 +523,60 @@ function PhotosTab() {
     loadPhotos();
   }
 
+  function toggleSelect(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function selectAll() {
+    setSelected(new Set(filtered.map(p => p.id)));
+  }
+
+  function deselectAll() {
+    setSelected(new Set());
+  }
+
+  function triggerZipDownload(ids?: string[]) {
+    const qs = ids && ids.length > 0 ? `?ids=${encodeURIComponent(ids.join(","))}` : "";
+    const a = document.createElement("a");
+    a.href = `/api/admin/photos/download-zip${qs}`;
+    a.download = "wedding-photos.zip";
+    a.click();
+  }
+
+  async function downloadSelected() {
+    if (selected.size === 0) return;
+    if (selected.size > 50 && !confirm(`Downloading ${selected.size} originals may take a while. Continue?`)) return;
+    setZipping(true);
+    triggerZipDownload([...selected]);
+    setTimeout(() => setZipping(false), 2000);
+  }
+
+  async function downloadAll() {
+    const withOriginals = photos.filter(p => p.original_url);
+    if (withOriginals.length === 0) { alert("No originals have been stored yet."); return; }
+    if (withOriginals.length > 50 && !confirm(`Downloading all ${withOriginals.length} originals may take a while. Continue?`)) return;
+    setZipping(true);
+    triggerZipDownload();
+    setTimeout(() => setZipping(false), 2000);
+  }
+
   const filtered = filter === "all" ? photos : photos.filter(p => p.status === filter);
+  const withOriginals = photos.filter(p => p.original_url).length;
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <span style={{ fontSize: 13, color: C.sage }}>{photos.length} photo{photos.length !== 1 ? "s" : ""}</span>
+      {/* Top bar */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 16 }}>
+        <span style={{ fontSize: 13, color: C.sage, marginRight: "auto" }}>
+          {photos.length} photo{photos.length !== 1 ? "s" : ""}
+          {withOriginals > 0 && ` · ${withOriginals} with originals`}
+        </span>
+
+        {/* Filter */}
         <div style={{ display: "flex", gap: 4 }}>
           {(["all", "visible", "hidden"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
@@ -539,6 +590,35 @@ function PhotosTab() {
         </div>
       </div>
 
+      {/* Selection + download toolbar */}
+      <div style={{
+        display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center",
+        marginBottom: 14, padding: "10px 14px",
+        backgroundColor: "#f0f5f0", borderRadius: 8, border: `1px solid ${C.line}`,
+      }}>
+        <span style={{ fontSize: 12, color: C.sage }}>
+          {selected.size > 0 ? `${selected.size} selected` : "Select photos to download"}
+        </span>
+        <button onClick={selectAll} style={{ ...btnStyle("ghost"), fontSize: 11, padding: "4px 10px" }}>Select All</button>
+        <button onClick={deselectAll} disabled={selected.size === 0} style={{ ...btnStyle("ghost"), fontSize: 11, padding: "4px 10px", opacity: selected.size === 0 ? 0.4 : 1 }}>Deselect All</button>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+          <button
+            onClick={downloadSelected}
+            disabled={selected.size === 0 || zipping}
+            style={{ ...btnStyle("primary"), fontSize: 11, padding: "5px 12px", opacity: selected.size === 0 ? 0.4 : 1 }}
+          >
+            {zipping ? "Preparing…" : `⬇ Download Selected${selected.size > 0 ? ` (${selected.size})` : ""}`}
+          </button>
+          <button
+            onClick={downloadAll}
+            disabled={withOriginals === 0 || zipping}
+            style={{ ...btnStyle("primary"), fontSize: 11, padding: "5px 12px", opacity: withOriginals === 0 ? 0.4 : 1 }}
+          >
+            {zipping ? "Preparing…" : "⬇ Download All (ZIP)"}
+          </button>
+        </div>
+      </div>
+
       {loading ? (
         <p style={{ color: C.sage }}>Loading…</p>
       ) : filtered.length === 0 ? (
@@ -547,40 +627,74 @@ function PhotosTab() {
         </p>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-          {filtered.map(p => (
-            <div key={p.id} style={{
-              backgroundColor: C.card, borderRadius: 10, overflow: "hidden",
-              border: `1px solid ${C.line}`,
-              opacity: p.status === "hidden" ? 0.6 : 1,
-            }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.thumb_url}
-                alt={`Photo by ${p.uploader_name}`}
-                style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
-              />
-              <div style={{ padding: "10px 12px" }}>
-                <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.deep }}>{p.uploader_name}</p>
-                {p.message && <p style={{ margin: "4px 0 0", fontSize: 11, color: C.sage, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.message}</p>}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                    padding: "2px 7px", borderRadius: 8,
-                    backgroundColor: p.status === "visible" ? "#e8f5e8" : "#fce8e8",
-                    color: p.status === "visible" ? C.success : C.danger,
-                  }}>
-                    {p.status}
-                  </span>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    <button onClick={() => toggleStatus(p)} style={{ ...btnStyle("ghost"), fontSize: 10, padding: "3px 8px" }}>
-                      {p.status === "visible" ? "Hide" : "Show"}
-                    </button>
-                    <button onClick={() => deletePhoto(p)} style={{ ...btnStyle("danger"), fontSize: 10, padding: "3px 8px" }}>Del</button>
+          {filtered.map(p => {
+            const isSelected = selected.has(p.id);
+            return (
+              <div key={p.id} style={{
+                backgroundColor: C.card, borderRadius: 10, overflow: "hidden",
+                border: `2px solid ${isSelected ? C.deep : C.line}`,
+                opacity: p.status === "hidden" ? 0.6 : 1,
+                position: "relative",
+              }}>
+                {/* Checkbox */}
+                <div
+                  onClick={() => toggleSelect(p.id)}
+                  style={{
+                    position: "absolute", top: 8, left: 8, zIndex: 2,
+                    width: 20, height: 20, borderRadius: 4,
+                    backgroundColor: isSelected ? C.deep : "rgba(255,255,255,0.85)",
+                    border: `2px solid ${isSelected ? C.deep : "rgba(0,0,0,0.25)"}`,
+                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  {isSelected && <span style={{ color: "#fff", fontSize: 12, lineHeight: 1 }}>✓</span>}
+                </div>
+
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.thumb_url}
+                  alt={`Photo by ${p.uploader_name}`}
+                  style={{ width: "100%", height: 160, objectFit: "cover", display: "block", cursor: "pointer" }}
+                  onClick={() => toggleSelect(p.id)}
+                />
+                <div style={{ padding: "10px 12px" }}>
+                  <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.deep }}>{p.uploader_name}</p>
+                  {p.message && <p style={{ margin: "4px 0 0", fontSize: 11, color: C.sage, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.message}</p>}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                      padding: "2px 7px", borderRadius: 8,
+                      backgroundColor: p.status === "visible" ? "#e8f5e8" : "#fce8e8",
+                      color: p.status === "visible" ? C.success : C.danger,
+                    }}>
+                      {p.status}
+                    </span>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <button onClick={() => toggleStatus(p)} style={{ ...btnStyle("ghost"), fontSize: 10, padding: "3px 8px" }}>
+                        {p.status === "visible" ? "Hide" : "Show"}
+                      </button>
+                      <button onClick={() => deletePhoto(p)} style={{ ...btnStyle("danger"), fontSize: 10, padding: "3px 8px" }}>Del</button>
+                    </div>
                   </div>
+                  {/* Individual original download */}
+                  {p.original_url && (
+                    <a
+                      href={p.original_url}
+                      download
+                      style={{
+                        display: "block", marginTop: 8, textAlign: "center",
+                        fontSize: 10, fontWeight: 600, letterSpacing: "0.08em",
+                        color: C.sage, textDecoration: "none",
+                        padding: "4px 0", borderTop: `1px solid ${C.line}`,
+                      }}
+                    >
+                      ⬇ Original
+                    </a>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

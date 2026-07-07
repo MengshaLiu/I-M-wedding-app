@@ -97,15 +97,20 @@ link to each guest; the link decides what that guest sees.
 
 ### 3.3 Photo + wishes gallery
 
-- **F-3.1** Guests upload one or more **photos** taken on the day, each with an
-  optional **wish message** and the uploader's display name.
+- **F-3.1** Guests upload one or more **photos** taken on the day (up to 10
+  selected at once via a multi-file picker), each sharing an optional **wish
+  message** and the uploader's display name. Photos are posted sequentially
+  with progress feedback; a per-photo error stops the batch and reports which
+  photo failed.
 - **F-3.2** A gallery view shows uploaded photos with their messages, newest
   first, in a mobile-friendly grid/feed.
 - **F-3.3** Uploads are validated: **image types only** (jpg/png/webp/heic),
   per-file **size cap** (e.g. 10 MB), and a per-guest **rate/quantity limit**
   to control cost and abuse.
-- **F-3.4** Images are **resized/compressed** server-side; a thumbnail and a
-  display-size version are stored (originals optionally discarded to save cost).
+- **F-3.4** Images are **resized/compressed** server-side; the original file, a
+  display-size version (max 1920 px, WebP), and a thumbnail (max 400 px, WebP)
+  are all stored. Originals are retained so the couple can download them after
+  the wedding.
 - **F-3.5 Moderation:** 
   - *Auto-show* (default): photos appear immediately; couple removes anything
     unwanted. Best for a live wedding day.
@@ -147,6 +152,10 @@ You cannot run or test the public site without these. Keep it minimal but real.
   only.
 - **F-5.4** Manage **tables** and seat assignments.
 - **F-5.5** **Moderate** the gallery (hide/delete; approve if pre-approval mode).
+- **F-5.5b** **Download** photo originals from the gallery moderation UI:
+  - Individual photo: "⬇ Original" link on each card.
+  - Selective: checkbox-select any photos → "Download Selected (ZIP)".
+  - Bulk: "Download All (ZIP)" fetches every stored original as a single ZIP.
 
 ---
 

@@ -2,11 +2,13 @@ import asyncio
 import csv
 import hmac
 import io
+import re
 import uuid
+import zipfile
 from datetime import datetime, timedelta, timezone
 
 import qrcode
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response, StreamingResponse
 from jose import jwt
 from sqlalchemy import func, select
@@ -365,11 +367,60 @@ async def list_photos(
             message=p.message,
             url=storage.public_url(p.storage_key),
             thumb_url=storage.public_url(p.thumb_key),
+            original_url=storage.public_url(p.original_key) if p.original_key else None,
             status=p.status,
             created_at=p.created_at.isoformat(),
         )
         for p in rows
     ]
+
+
+@router.get("/photos/download-zip")
+async def download_photos_zip(
+    ids: str | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    _admin: dict = Depends(require_admin),
+):
+    if ids:
+        id_list = []
+        for raw in ids.split(","):
+            raw = raw.strip()
+            try:
+                id_list.append(uuid.UUID(raw))
+            except ValueError:
+                pass
+        rows = (
+            await db.execute(select(Photo).where(Photo.id.in_(id_list)))
+        ).scalars().all()
+    else:
+        rows = (
+            await db.execute(select(Photo).order_by(Photo.created_at.asc()))
+        ).scalars().all()
+
+    rows = [p for p in rows if p.original_key]
+    if not rows:
+        raise HTTPException(404, "No photos with originals found")
+
+    buf = io.BytesIO()
+    loop = asyncio.get_event_loop()
+
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        for p in rows:
+            data = await loop.run_in_executor(
+                None, lambda key=p.original_key: storage.download(key)
+            )
+            ext = p.original_key.rsplit(".", 1)[-1] if "." in p.original_key else "jpg"
+            date_str = p.created_at.strftime("%Y%m%d")
+            safe_name = re.sub(r"[^\w]", "_", p.uploader_name)[:30]
+            filename = f"{date_str}_{safe_name}_{str(p.id)[:8]}.{ext}"
+            zf.writestr(filename, data)
+
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="wedding-photos.zip"'},
+    )
 
 
 @router.patch("/photos/{photo_id}", response_model=AdminPhotoOut)
@@ -400,6 +451,7 @@ async def update_photo(
         message=photo.message,
         url=storage.public_url(photo.storage_key),
         thumb_url=storage.public_url(photo.thumb_key),
+        original_url=storage.public_url(photo.original_key) if photo.original_key else None,
         status=photo.status,
         created_at=photo.created_at.isoformat(),
     )
@@ -420,7 +472,7 @@ async def delete_photo(
     if not photo:
         raise HTTPException(404, "Photo not found")
 
-    keys = [photo.storage_key, photo.thumb_key]
+    keys = [k for k in [photo.storage_key, photo.thumb_key, photo.original_key] if k]
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, lambda: storage.delete_objects(keys))
 

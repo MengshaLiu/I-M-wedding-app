@@ -431,6 +431,7 @@ const RF = {
   greatVibes: "var(--font-great-vibes), 'Great Vibes', cursive",
   mulish: "var(--font-mulish), 'Mulish', sans-serif",
   dancing: "var(--font-dancing), 'Dancing Script', cursive",
+  maShanZheng: "var(--font-ma-shan-zheng), 'Ma Shan Zheng', cursive",
 } as const;
 
 function DoubleHappinessDivider() {
@@ -471,12 +472,21 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
         <h1 style={{
           fontFamily: RF.greatVibes,
           fontSize: "clamp(52px, 13vw, 76px)",
-          fontWeight: 400, margin: "0 0 8px", lineHeight: 1.08,
+          fontWeight: 400, margin: "0 0 4px", lineHeight: 1.08,
         }}>
           <span style={{ color: RC.red }}>Ivan</span>{" "}
           <span style={{ color: RC.gold }}>&amp;</span>{" "}
           <span style={{ color: RC.red }}>Mengsha</span>
         </h1>
+        <p style={{
+          fontFamily: RF.maShanZheng,
+          fontSize: "clamp(36px, 10vw, 56px)",
+          margin: "0 0 8px", lineHeight: 1.15, letterSpacing: "0.05em",
+        }}>
+          <span style={{ color: RC.red }}>蔡昭文</span>{" "}
+          <span style={{ color: RC.gold }}>&amp;</span>{" "}
+          <span style={{ color: RC.red }}>刘梦莎</span>
+        </p>
         <div style={{ width: "100%", marginTop: 6, animation: "fadeIn 1.2s ease-out 0.3s both" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -497,7 +507,7 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           fontSize: "clamp(22px, 6vw, 31px)",
           fontWeight: 500, color: RC.gold, margin: "18px 0 0",
         }}>
-          are getting married
+          We are getting married
         </p>
         <p style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Serif SC', serif",
@@ -609,68 +619,92 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
             </p>
             <div style={{ width: 26, height: 1, backgroundColor: RC.border }} />
           </div>
-          {!!data.venue_map_url && (
-            <a
-              href={String(data.venue_map_url)}
-              target="_blank" rel="noopener noreferrer"
-              style={{
-                display: "inline-flex", flexDirection: "column", alignItems: "center",
-                fontFamily: RF.mulish, fontSize: 12, fontWeight: 600, letterSpacing: "0.25em",
-                textTransform: "uppercase", color: RC.btnText,
-                backgroundColor: RC.red, padding: "13px 34px",
-                textDecoration: "none", borderRadius: 22, gap: 2,
-              }}
-            >
-              <span>View Map</span>
-              <span style={{
-                fontFamily: "'PingFang SC', 'Microsoft YaHei', sans-serif",
-                fontSize: 10, letterSpacing: "0.1em", textTransform: "none", opacity: 0.9,
-              }}>查看地图</span>
-            </a>
-          )}
+          <a
+            href="/seats"
+            style={{
+              display: "inline-flex", flexDirection: "column", alignItems: "center",
+              fontFamily: RF.mulish, fontSize: 12, fontWeight: 600, letterSpacing: "0.25em",
+              textTransform: "uppercase", color: RC.btnText,
+              backgroundColor: RC.red, padding: "13px 34px",
+              textDecoration: "none", borderRadius: 22, gap: 2,
+            }}
+          >
+            <span>Find My Seat</span>
+            <span style={{
+              fontFamily: "'PingFang SC', 'Microsoft YaHei', sans-serif",
+              fontSize: 10, letterSpacing: "0.1em", textTransform: "none", opacity: 0.9,
+            }}>查找我的座位</span>
+          </a>
         </div>
       </div>
 
-      {/* ── Dress code ── */}
-      <div style={{
+      {/* ── Dress code (commented out) ── */}
+      {/* <div style={{
         width: "100%", maxWidth: 720, padding: "92px 24px 0",
         display: "flex", flexDirection: "column", alignItems: "center",
         textAlign: "center", animation: "fadeInUp 1s ease-out 0.9s both",
       }}>
+        <p>Dress Code · 着装要求</p>
+        <h2>{String(data.dress_code || "Warm & Festive")}</h2>
+        <p>温馨喜庆</p>
+        <p>Guests are warmly invited to dress in light and elegant colors...</p>
+        <p>我们诚邀宾客着淡雅色系服装出席。烦请避免全黑、全白或大红色。</p>
+      </div> */}
+
+      {/* ── With Gratitude ── */}
+      <div style={{
+        width: "100%", maxWidth: 720, padding: "80px 28px 0",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        textAlign: "center", animation: "fadeInUp 1s ease-out 0.9s both",
+      }}>
         <p style={{
-          fontFamily: RF.mulish, fontSize: 13, fontWeight: 500,
-          letterSpacing: "0.4em", textTransform: "uppercase",
-          color: RC.pink, margin: "0 0 10px",
+          fontFamily: RF.mulish, fontSize: 12, fontWeight: 600,
+          letterSpacing: "0.38em", textTransform: "uppercase",
+          color: RC.pink, margin: "0 0 4px",
         }}>
-          Dress Code · 着装要求
+          With Gratitude
+        </p>
+        <p style={{
+          fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
+          fontSize: 13, color: RC.warmGold, letterSpacing: "0.28em",
+          margin: "0 0 18px",
+        }}>
+          衷心感谢
         </p>
         <h2 style={{
           fontFamily: RF.cormorant,
-          fontSize: "clamp(32px, 8vw, 46px)",
-          fontWeight: 500, color: RC.red, margin: "0 0 4px",
+          fontSize: "clamp(36px, 9vw, 58px)",
+          fontWeight: 500, color: RC.red, margin: "0 0 6px", lineHeight: 1.15,
         }}>
-          {String(data.dress_code || "Warm & Festive")}
+          It is Our Big Day
         </h2>
         <p style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
-          fontSize: 18, color: RC.warmGold, letterSpacing: "0.2em", margin: "0 0 16px",
+          fontSize: 17, color: RC.warmGold, letterSpacing: "0.18em", margin: "0 0 24px",
         }}>
-          温馨喜庆
+          今天是我们的大日子
         </p>
         <p style={{
           fontFamily: RF.mulish, fontSize: 15, color: RC.brown,
-          maxWidth: 440, lineHeight: 1.75, margin: 0,
+          maxWidth: 560, lineHeight: 1.85, margin: "0 0 16px",
         }}>
-          Guests are warmly invited to dress in shades of blush, gold, and champagne.
-          Please kindly avoid white and black out of respect for tradition.
+          Today, our two families become one, and we get to share it with the
+          people who mean the most to us. Thank you for travelling near and far
+          to stand by our side. Here&apos;s to red envelopes, good tea, great food,
+          and a night full of laughter. 
+          <p>We&apos;re so glad you&apos;re here.</p>
         </p>
         <p style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
-          fontSize: 14, color: RC.brown, maxWidth: 400,
-          lineHeight: 1.9, margin: "10px 0 0", opacity: 0.85,
+          fontSize: 14, color: RC.brown, maxWidth: 500,
+          lineHeight: 2, margin: 0, opacity: 0.88,
         }}>
-          我们诚邀宾客着腮红色、金色及香槟色系服装出席。
-          烦请避免穿着全白或全黑，以示对传统礼仪的尊重。
+          今天，两个家庭合二为一，我们有幸与最重要的人共同分享这一刻。
+          感谢您跋山涉水，前来见证我们的幸福。
+          愿, 
+          红包满载, 好茶飘香
+          美食不断，笑声不绝。
+          <p>很高兴今天有您共见欢喜。</p>
         </p>
       </div>
 
@@ -781,7 +815,7 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           fontSize: "clamp(30px, 8vw, 46px)",
           color: RC.red, margin: "0 0 6px", lineHeight: 1.25,
         }}>
-          We can&apos;t wait to celebrate with you
+          Thank you for celebrating with us
         </p>
         <p style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",

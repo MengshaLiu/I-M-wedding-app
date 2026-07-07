@@ -82,8 +82,8 @@ export default async function GuestLayout({ children }: { children: React.ReactN
   // Reception guest layout — Chinese red theme
   const receptionLinks = [
     { label: "Home", chinese: "首页", href: "/" },
-    { label: "Moments", chinese: "美好瞬间", href: "/moments" },
     { label: "Seat Finder", chinese: "座位查询", href: "/seats" },
+    { label: "Moments", chinese: "美好瞬间", href: "/moments" }
   ];
   const RC = {
     red: "#b23a2b",

@@ -117,6 +117,7 @@ class AdminPhotoOut(BaseModel):
     message: str | None
     url: str
     thumb_url: str
+    original_url: str | None
     status: str
     created_at: str
 

@@ -3,6 +3,7 @@ import {
   Great_Vibes,
   Mulish,
   Dancing_Script,
+  Ma_Shan_Zheng,
 } from "next/font/google";
 
 export const cormorant = Cormorant_Garamond({
@@ -32,4 +33,11 @@ export const dancingScript = Dancing_Script({
   weight: ["400", "500", "600"],
   variable: "--font-dancing",
   display: "swap",
+});
+
+export const maShanZheng = Ma_Shan_Zheng({
+  weight: ["400"],
+  variable: "--font-ma-shan-zheng",
+  display: "swap",
+  preload: false,
 });

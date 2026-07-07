@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { cormorant, greatVibes, mulish, dancingScript } from "@/lib/fonts";
+import { cormorant, greatVibes, mulish, dancingScript, maShanZheng } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "I & M — Wedding",
@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${greatVibes.variable} ${mulish.variable} ${dancingScript.variable}`}
+      className={`${cormorant.variable} ${greatVibes.variable} ${mulish.variable} ${dancingScript.variable} ${maShanZheng.variable}`}
     >
       <body className="min-h-screen" suppressHydrationWarning>{children}</body>
     </html>

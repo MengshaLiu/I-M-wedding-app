@@ -40,11 +40,14 @@ export default function MomentsPageReception() {
   const [showModal, setShowModal] = useState(false);
   const [lightbox, setLightbox] = useState<Photo | null>(null);
 
+  interface FileEntry { file: File; preview: string; }
+  const MAX_FILES = 10;
+
   const [uploaderName, setUploaderName] = useState("");
   const [message, setMessage] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [fileEntries, setFileEntries] = useState<FileEntry[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -63,42 +66,68 @@ export default function MomentsPageReception() {
   useEffect(() => { fetchPhotos(1); }, [fetchPhotos]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0] ?? null;
-    setFile(f);
-    if (f) setPreview(URL.createObjectURL(f));
-    else setPreview(null);
+    const incoming = Array.from(e.target.files ?? []);
+    if (!incoming.length) return;
+    setFileEntries(prev => {
+      const slots = MAX_FILES - prev.length;
+      const added = incoming.slice(0, slots).map(f => ({ file: f, preview: URL.createObjectURL(f) }));
+      return [...prev, ...added];
+    });
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  function removeFile(i: number) {
+    setFileEntries(prev => {
+      URL.revokeObjectURL(prev[i].preview);
+      return prev.filter((_, idx) => idx !== i);
+    });
   }
 
   function openModal() {
-    setUploaderName(""); setMessage(""); setFile(null); setPreview(null);
-    setUploadError("");
+    setUploaderName(""); setMessage("");
+    fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
+    setFileEntries([]);
+    setUploadError(""); setUploadProgress("");
     setShowModal(true);
+  }
+
+  function closeModal() {
+    fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
+    setFileEntries([]);
+    setUploadError(""); setUploadProgress("");
+    setShowModal(false);
   }
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
-    if (!file || !uploaderName.trim()) return;
+    if (!fileEntries.length || !uploaderName.trim()) return;
     setUploading(true);
     setUploadError("");
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("uploader_name", uploaderName.trim());
-      fd.append("message", message.trim());
-      const res = await fetch("/api/moments", { method: "POST", body: fd });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? "Upload failed");
+    const uploaded: Photo[] = [];
+    for (let i = 0; i < fileEntries.length; i++) {
+      setUploadProgress(fileEntries.length > 1 ? `Uploading ${i + 1} of ${fileEntries.length}…` : "Uploading…");
+      try {
+        const fd = new FormData();
+        fd.append("file", fileEntries[i].file);
+        fd.append("uploader_name", uploaderName.trim());
+        fd.append("message", message.trim());
+        const res = await fetch("/api/moments", { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail ?? "Upload failed");
+        }
+        uploaded.push(await res.json());
+      } catch (err: unknown) {
+        setUploadError(`Photo ${i + 1} failed: ${err instanceof Error ? err.message : "Upload failed"}`);
+        setUploading(false);
+        setUploadProgress("");
+        return;
       }
-      const newPhoto: Photo = await res.json();
-      setPhotos(prev => [newPhoto, ...prev]);
-      setTotal(t => t + 1);
-      setShowModal(false);
-    } catch (err: unknown) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
     }
+    setPhotos(prev => [...uploaded.reverse(), ...prev]);
+    setTotal(t => t + uploaded.length);
+    setUploading(false);
+    closeModal();
   }
 
   const hasMore = photos.length < total;
@@ -208,17 +237,18 @@ export default function MomentsPageReception() {
           position: "fixed", inset: 0, backgroundColor: C.overlay,
           display: "flex", alignItems: "center", justifyContent: "center",
           zIndex: 50, padding: 16,
-        }} onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
+        }} onClick={e => { if (e.target === e.currentTarget) closeModal(); }}>
           <div style={{
             backgroundColor: C.bg, borderRadius: 20, padding: "36px 28px",
             width: "100%", maxWidth: 440, position: "relative",
+            maxHeight: "90vh", overflowY: "auto",
           }}>
-            <button onClick={() => setShowModal(false)} style={{
+            <button onClick={closeModal} style={{
               position: "absolute", top: 16, right: 18, background: "none",
               border: "none", cursor: "pointer", fontSize: 20, color: C.muted,
             }}>✕</button>
 
-            <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.red, margin: "0 0 2px" }}>share your photo</p>
+            <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.red, margin: "0 0 2px" }}>share your photos</p>
             <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, letterSpacing: "0.15em", margin: "0 0 6px" }}>分享您的照片</p>
             <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 4px" }}>
               Upload · <span style={{ fontFamily: ZH, fontSize: 22 }}>上传</span>
@@ -226,31 +256,65 @@ export default function MomentsPageReception() {
             <div style={{ height: 16 }} />
 
             <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* File picker */}
-              <div
-                onClick={() => fileRef.current?.click()}
-                style={{
-                  border: `1.5px dashed ${file ? C.red : C.line}`,
-                  borderRadius: 12, padding: preview ? 0 : "28px 16px",
-                  textAlign: "center", cursor: "pointer",
-                  overflow: "hidden", minHeight: preview ? 160 : undefined,
-                  backgroundColor: "rgba(255,255,255,0.5)",
-                }}
-              >
-                {preview ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={preview} alt="preview" style={{ width: "100%", maxHeight: 240, objectFit: "cover" }} />
-                ) : (
-                  <>
-                    <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
-                    <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose a photo</p>
-                    <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "2px 0 0" }}>点击选择照片</p>
-                    <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 10 MB</p>
-                  </>
-                )}
-              </div>
+              {/* File picker / previews */}
+              {fileEntries.length === 0 ? (
+                <div
+                  onClick={() => fileRef.current?.click()}
+                  style={{
+                    border: `1.5px dashed ${C.line}`, borderRadius: 12, padding: "28px 16px",
+                    textAlign: "center", cursor: "pointer", backgroundColor: "rgba(255,255,255,0.5)",
+                  }}
+                >
+                  <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
+                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
+                  <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "2px 0 0" }}>点击选择照片</p>
+                  <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 10 MB each · up to {MAX_FILES} photos</p>
+                </div>
+              ) : (
+                <div>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
+                    gap: 8,
+                  }}>
+                    {fileEntries.map((entry, i) => (
+                      <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={entry.preview} alt={`Photo ${i + 1}`} style={{
+                          width: "100%",
+                          height: fileEntries.length === 1 ? 200 : 90,
+                          objectFit: "cover", display: "block",
+                        }} />
+                        <button
+                          type="button" onClick={() => removeFile(i)}
+                          style={{
+                            position: "absolute", top: 4, right: 4,
+                            width: 22, height: 22, borderRadius: "50%",
+                            background: "rgba(0,0,0,0.55)", border: "none",
+                            color: "#fff", fontSize: 12, cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                          }}
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                  {fileEntries.length < MAX_FILES && (
+                    <button
+                      type="button" onClick={() => fileRef.current?.click()}
+                      style={{
+                        marginTop: 8, width: "100%", padding: "8px",
+                        border: `1px dashed ${C.line}`, borderRadius: 8,
+                        background: "transparent", cursor: "pointer",
+                        fontSize: 12, color: C.red, fontFamily: F.mulish,
+                      }}
+                    >
+                      + Add more · 继续添加 ({fileEntries.length}/{MAX_FILES})
+                    </button>
+                  )}
+                </div>
+              )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-                style={{ display: "none" }} onChange={handleFileChange} />
+                multiple style={{ display: "none" }} onChange={handleFileChange} />
 
               <input
                 type="text" required placeholder="Your name · 您的姓名 *"
@@ -263,7 +327,7 @@ export default function MomentsPageReception() {
               />
 
               <textarea
-                placeholder="Add a wish or message · 添加祝福语（可选）"
+                placeholder="Add a wish or message · 添加祝福语（可选，所有照片共用）"
                 value={message} onChange={e => setMessage(e.target.value)}
                 rows={3}
                 style={{
@@ -278,17 +342,23 @@ export default function MomentsPageReception() {
                 <p style={{ fontSize: 12, color: C.red, margin: 0 }}>{uploadError}</p>
               )}
 
-              <button type="submit" disabled={!file || !uploaderName.trim() || uploading}
+              <button type="submit" disabled={!fileEntries.length || !uploaderName.trim() || uploading}
                 style={{
                   fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
                   letterSpacing: "0.25em", textTransform: "uppercase",
                   color: C.btnText, backgroundColor: C.btnBg,
                   padding: "12px 24px", border: "none", cursor: "pointer",
-                  borderRadius: 20, opacity: (!file || !uploaderName.trim() || uploading) ? 0.5 : 1,
+                  borderRadius: 20, opacity: (!fileEntries.length || !uploaderName.trim() || uploading) ? 0.5 : 1,
                   display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
                   width: "100%",
                 }}>
-                <span>{uploading ? "Uploading…" : "Share Photo"}</span>
+                <span>
+                  {uploading
+                    ? uploadProgress
+                    : fileEntries.length > 1
+                      ? `Share ${fileEntries.length} Photos`
+                      : "Share Photo"}
+                </span>
                 <span style={{ fontFamily: ZH, fontSize: 11, letterSpacing: "0.1em", textTransform: "none" }}>
                   {uploading ? "上传中…" : "分享照片"}
                 </span>

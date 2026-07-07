@@ -80,9 +80,15 @@ async def upload_photo(
         raise HTTPException(400, str(exc))
 
     photo_id = uuid.uuid4()
+    ext_map = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+    orig_ext = ext_map.get(file.content_type or "", "jpg")
+    orig_key = f"photos/{photo_id}/original.{orig_ext}"
     disp_key = f"photos/{photo_id}/display.webp"
     thumb_key_str = f"photos/{photo_id}/thumb.webp"
 
+    await loop.run_in_executor(
+        None, lambda: storage.upload(orig_key, data, file.content_type or "image/jpeg")
+    )
     await loop.run_in_executor(
         None, lambda: storage.upload(disp_key, display_bytes, "image/webp")
     )
@@ -96,6 +102,7 @@ async def upload_photo(
         message=message.strip()[:500] or None,
         storage_key=disp_key,
         thumb_key=thumb_key_str,
+        original_key=orig_key,
         status="visible",
     )
     db.add(photo)

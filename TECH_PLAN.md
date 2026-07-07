@@ -135,8 +135,9 @@ photos
   guest_id        uuid fk → guests.id
   uploader_name   text
   message         text null
-  storage_key     text            -- display image
-  thumb_key       text
+  original_key    text null       -- raw uploaded file (jpg/png/webp)
+  storage_key     text            -- display image (WebP, max 1920 px)
+  thumb_key       text            -- thumbnail (WebP, max 400 px)
   status          enum('visible','hidden','pending') default 'visible'
   created_at      timestamptz
 
@@ -204,10 +205,13 @@ endpoint filters `timeline_events` by `guest.tier` server-side.
 1. Validate MIME + magic bytes (images only), enforce size cap, per-guest count
    limit (rate-limit by token).
 2. Pillow: auto-orient (EXIF), strip EXIF/GPS metadata (privacy), produce a
-   capped-resolution **display** image + a small **thumbnail** (both WebP).
-3. Upload both to object storage with random keys; store keys in `photos`.
-4. Serve via storage public URLs (or signed URLs); gallery loads thumbnails and
-   lazy-loads full images. Discard originals unless the couple wants keepsakes.
+   capped-resolution **display** image (max 1920 px) + a small **thumbnail**
+   (max 400 px), both WebP.
+3. Upload three objects to storage: `photos/{uuid}/original.{ext}` (raw bytes),
+   `photos/{uuid}/display.webp`, `photos/{uuid}/thumb.webp`; store all three
+   keys in `photos`.
+4. Serve display/thumb via storage public URLs; gallery loads thumbnails and
+   lazy-loads full display images. Originals are retained for admin download.
 
 ---
 
@@ -302,6 +306,30 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
 - **DoD:** Couple views both invite links in the admin panel, downloads each as
   a QR code PNG ready to print, rotates a code if needed, and both tiers reach
   the correct experience — all without developer help.
+
+### Sprint 7 — Feature optimisation
+- **Goal:** Quality-of-life improvements surfaced after initial build.
+- **Tasks:**
+  - **Original photo storage + admin download** — Store the raw uploaded file
+    (`original.{ext}`) alongside the display and thumb WebP derivatives.
+    Admin Photos tab gains: per-card "⬇ Original" link, checkbox multi-select,
+    "Download Selected (ZIP)" and "Download All (ZIP)" buttons. Backend adds
+    `GET /api/admin/photos/download-zip?ids=...` which fetches originals from
+    MinIO and returns a streaming ZIP (`ZIP_STORED`). Migration `004` adds
+    `original_key text null` to `photos`. Existing photos without an original
+    stored show no download link.
+  - **Multi-photo upload UI** — Replace single-file picker with a multi-select
+    input (`multiple` attribute, up to 10 files). After selection, show a
+    preview grid with per-photo remove buttons and an "Add more" affordance.
+    Submit button updates its label to "Share N Photos" and shows per-photo
+    progress ("Uploading 2 of 5…"). The one shared message applies to all
+    photos in the batch. No backend changes required — the frontend loops
+    sequentially over `POST /api/moments`. Applied to both `MomentsPageFull`
+    and `MomentsPageReception`. Object URLs properly revoked on modal close /
+    photo removal to prevent memory leaks.
+- **DoD:** Guest can select multiple photos in one picker interaction, see
+  previews before submitting, remove individual photos, and see upload progress;
+  all photos appear in the gallery after a successful batch upload.
 
 ---
 
