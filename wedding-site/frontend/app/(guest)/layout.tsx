@@ -35,9 +35,10 @@ export default async function GuestLayout({ children }: { children: React.ReactN
 
   if (isFullGuest) {
     const links = [
-      { label: "Seat Finder", href: "/seats" },
+      { label: "Home", href: "/" },
+      { label: "Travel Guide", href: "/travel" },
+      // { label: "Seat Finder", href: "/seats" },
       { label: "Moments", href: "/moments" },
-      { label: "Travel", href: "/travel" },
     ];
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: C.bg }}>

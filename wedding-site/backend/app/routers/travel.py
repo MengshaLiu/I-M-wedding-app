@@ -73,7 +73,7 @@ TRAVEL_CONTENT = [
             ),
         ],
     ),
-     TravelSection(
+    TravelSection(
         title="Where to Shop",
         items=[
             TravelItem(
@@ -107,7 +107,6 @@ TRAVEL_CONTENT = [
             ),
         ],
     ),
-    
     TravelSection(
         title="Entertainment & Activities",
         items=[
