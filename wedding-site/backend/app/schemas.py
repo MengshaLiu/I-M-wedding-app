@@ -32,7 +32,7 @@ class HomeResponse(BaseModel):
 
 
 class SeatResult(BaseModel):
-    display_name: str
+    name: str
     table_label: str
 
 
@@ -73,7 +73,7 @@ class AdminLoginResponse(BaseModel):
 class GuestOut(BaseModel):
     id: str
     name: str
-    display_name: str
+    pax: int | None
     tier: str
     table_id: str | None
     table_label: str | None
@@ -81,14 +81,14 @@ class GuestOut(BaseModel):
 
 class GuestCreate(BaseModel):
     name: str
-    display_name: str
+    pax: int | None = None
     tier: str
     table_id: str | None = None
 
 
 class GuestUpdate(BaseModel):
     name: str | None = None
-    display_name: str | None = None
+    pax: int | None = None
     tier: str | None = None
     table_id: str | None = None
     clear_table: bool = False  # set True to explicitly unassign table
@@ -128,7 +128,6 @@ class PhotoStatusUpdate(BaseModel):
 
 class GuestImportItem(BaseModel):
     name: str
-    display_name: str
     tier: str = "full"
     table_label: str | None = None
 

@@ -49,7 +49,7 @@ async def seats(
         if guest and guest.table_id:
             results.append(
                 SeatResult(
-                    display_name=guest.display_name,
+                    name=guest.name,
                     table_label=table_label_map.get(guest.table_id, "Unknown"),
                 )
             )

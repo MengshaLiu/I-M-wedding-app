@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 interface Guest {
   id: string;
   name: string;
-  display_name: string;
+  pax: number | null;
   tier: "full" | "reception";
   table_id: string | null;
   table_label: string | null;
@@ -177,7 +177,6 @@ function InviteLinksTab() {
 
 interface ImportRow {
   name: string;
-  display_name: string;
   tier: string;
   table_label: string;
   _error?: string;
@@ -208,13 +207,12 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
     if (raw.length === 0) { setParseError("The file appears to be empty."); return; }
     const parsed: ImportRow[] = raw.map((r) => {
       const name = findCol(r, "name", "fullname");
-      const display_name = findCol(r, "displayname", "displayname", "display") || name.split(" ")[0];
       const tier = (findCol(r, "tier", "type") || "full").toLowerCase();
       const table_label = findCol(r, "table", "tablelabel", "tablename");
       let _error: string | undefined;
       if (!name) _error = "Missing name";
       else if (!["full", "reception"].includes(tier)) _error = `Invalid tier "${tier}"`;
-      return { name, display_name, tier, table_label, _error };
+      return { name, tier, table_label, _error };
     });
     const seen = new Set<string>();
     for (const r of parsed) {
@@ -291,7 +289,6 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validRows.map(r => ({
           name: r.name,
-          display_name: r.display_name,
           tier: r.tier,
           table_label: r.table_label || null,
         }))),
@@ -332,7 +329,7 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
             {/* Format guide */}
             <div style={{ backgroundColor: "#f5f8f5", borderRadius: 8, padding: "12px 16px", marginBottom: 18, fontSize: 12, color: C.sage, lineHeight: 1.6 }}>
               <strong style={{ color: C.deep }}>Expected CSV columns (row 1 = header):</strong><br />
-              <code>name</code> · <code>display_name</code> · <code>tier</code> (full / reception, default: full) · <code>table</code> (optional — must match an existing table label exactly)<br />
+              <code>name</code> · <code>tier</code> (full / reception, default: full) · <code>table</code> (optional — must match an existing table label exactly)<br />
               <span style={{ marginTop: 4, display: "inline-block" }}>Tip: export from Excel via <em>File → Save As → CSV UTF-8</em></span>
             </div>
 
@@ -368,7 +365,7 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                     <thead>
                       <tr style={{ backgroundColor: "#f5f8f5", position: "sticky", top: 0 }}>
-                        {["Name", "Display Name", "Tier", "Table", "Status"].map(h => (
+                        {["Name", "Tier", "Table", "Status"].map(h => (
                           <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontWeight: 600, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: C.sage, borderBottom: `1px solid ${C.line}` }}>{h}</th>
                         ))}
                       </tr>
@@ -377,7 +374,6 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
                       {rows.map((r, i) => (
                         <tr key={i} style={{ borderBottom: `1px solid ${C.line}`, backgroundColor: r._error ? "#fff5f5" : i % 2 === 0 ? "#fff" : "#fafaf8" }}>
                           <td style={{ padding: "7px 10px", color: C.deep }}>{r.name || <em style={{ color: C.sage }}>—</em>}</td>
-                          <td style={{ padding: "7px 10px", color: C.sage }}>{r.display_name}</td>
                           <td style={{ padding: "7px 10px" }}>
                             <span style={{ padding: "1px 7px", borderRadius: 8, fontSize: 10, fontWeight: 600, backgroundColor: r.tier === "full" ? "#e8f0e8" : "#fce8e8", color: r.tier === "full" ? C.deep : "#b23a2b" }}>
                               {r.tier}
@@ -458,7 +454,7 @@ function SeatingTab() {
   const [showImport, setShowImport] = useState(false);
 
   // Guest form state
-  const [guestForm, setGuestForm] = useState({ name: "", display_name: "", tier: "full", table_id: "" });
+  const [guestForm, setGuestForm] = useState({ name: "", pax: "", tier: "full", table_id: "" });
   const [guestAddMode, setGuestAddMode] = useState(false);
   const [editingGuestId, setEditingGuestId] = useState<string | null>(null);
   const [guestSaving, setGuestSaving] = useState(false);
@@ -483,13 +479,13 @@ function SeatingTab() {
 
   // ── Guest handlers ──
   function startAddGuest() {
-    setGuestForm({ name: "", display_name: "", tier: "full", table_id: "" });
+    setGuestForm({ name: "", pax: "", tier: "full", table_id: "" });
     setGuestAddMode(true); setEditingGuestId(null); setGuestError("");
     setTableAddMode(false); setEditingTableId(null);
   }
 
   function startEditGuest(g: Guest) {
-    setGuestForm({ name: g.name, display_name: g.display_name, tier: g.tier, table_id: g.table_id ?? "" });
+    setGuestForm({ name: g.name, pax: g.pax != null ? String(g.pax) : "", tier: g.tier, table_id: g.table_id ?? "" });
     setEditingGuestId(g.id); setGuestAddMode(false); setGuestError("");
     setTableAddMode(false); setEditingTableId(null);
   }
@@ -499,7 +495,7 @@ function SeatingTab() {
   async function saveGuest(e: React.FormEvent) {
     e.preventDefault();
     setGuestSaving(true); setGuestError("");
-    const body = { name: guestForm.name.trim(), display_name: guestForm.display_name.trim(), tier: guestForm.tier, table_id: guestForm.table_id || null };
+    const body = { name: guestForm.name.trim(), pax: guestForm.pax !== "" ? parseInt(guestForm.pax) : null, tier: guestForm.tier, table_id: guestForm.table_id || null };
     try {
       const res = guestAddMode
         ? await apiFetch("/api/admin/guests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
@@ -559,7 +555,7 @@ function SeatingTab() {
   // ── Derived data ──
   const q = search.trim().toLowerCase();
   const filteredGuests = q
-    ? guests.filter(g => g.name.toLowerCase().includes(q) || g.display_name.toLowerCase().includes(q))
+    ? guests.filter(g => g.name.toLowerCase().includes(q))
     : guests;
 
   const guestsByTableId = new Map<string | null, Guest[]>();
@@ -584,7 +580,7 @@ function SeatingTab() {
       backgroundColor: i % 2 === 0 ? "#fff" : "#fafaf8",
     }}>
       <span style={{ flex: 1, color: C.deep, fontSize: 13, fontWeight: 500 }}>{g.name}</span>
-      <span style={{ color: C.sage, fontSize: 12, minWidth: 80 }}>{g.display_name}</span>
+      {g.pax != null && <span style={{ fontSize: 11, color: C.sage, whiteSpace: "nowrap" }}>{g.pax} pax</span>}
       {tierBadge(g.tier)}
       <div style={{ display: "flex", gap: 6 }}>
         <button onClick={() => startEditGuest(g)} style={{ ...btnStyle("ghost"), fontSize: 11, padding: "4px 10px" }}>Edit</button>
@@ -630,7 +626,7 @@ function SeatingTab() {
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <button onClick={startAddGuest} style={btnStyle("primary")}>+ Guest</button>
           <button onClick={startAddTable} style={btnStyle("primary")}>+ Table</button>
-          <button onClick={() => setShowImport(true)} style={btnStyle("ghost")}>Import Excel</button>
+          <button onClick={() => setShowImport(true)} style={btnStyle("ghost")}>Import CSV</button>
           <button onClick={downloadExport} style={btnStyle("ghost")}>Export CSV</button>
         </div>
       </div>
@@ -647,8 +643,8 @@ function SeatingTab() {
               <input style={inputStyle} value={guestForm.name} onChange={e => setGuestForm(f => ({ ...f, name: e.target.value }))} required />
             </div>
             <div>
-              <label style={labelStyle}>Display Name *</label>
-              <input style={inputStyle} value={guestForm.display_name} onChange={e => setGuestForm(f => ({ ...f, display_name: e.target.value }))} required />
+              <label style={labelStyle}>Pax (people count)</label>
+              <input style={inputStyle} type="number" min="1" placeholder="1" value={guestForm.pax} onChange={e => setGuestForm(f => ({ ...f, pax: e.target.value }))} />
             </div>
             <div>
               <label style={labelStyle}>Tier *</label>
@@ -712,7 +708,7 @@ function SeatingTab() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${C.line}` }}>
-                  {["Name", "Display", "Tier", "Table", ""].map(h => (
+                  {["Name", "Pax", "Tier", "Table", ""].map(h => (
                     <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.sage }}>{h}</th>
                   ))}
                 </tr>
@@ -721,7 +717,7 @@ function SeatingTab() {
                 {filteredGuests.map((g, i) => (
                   <tr key={g.id} style={{ borderBottom: `1px solid ${C.line}`, backgroundColor: i % 2 === 0 ? "#fff" : "#fafaf8" }}>
                     <td style={{ padding: "10px 12px", color: C.deep }}>{g.name}</td>
-                    <td style={{ padding: "10px 12px", color: C.sage }}>{g.display_name}</td>
+                    <td style={{ padding: "10px 12px", color: C.sage }}>{g.pax ?? "—"}</td>
                     <td style={{ padding: "10px 12px" }}>{tierBadge(g.tier)}</td>
                     <td style={{ padding: "10px 12px", color: C.sage }}>{g.table_label ?? "—"}</td>
                     <td style={{ padding: "10px 12px" }}>
@@ -746,7 +742,8 @@ function SeatingTab() {
 
           {tables.map(t => {
             const allInTable = guestsByTableId.get(t.id) ?? [];
-            const shown = q ? allInTable.filter(g => g.name.toLowerCase().includes(q) || g.display_name.toLowerCase().includes(q)) : allInTable;
+            const shown = q ? allInTable.filter(g => g.name.toLowerCase().includes(q)) : allInTable;
+            const totalPax = allInTable.reduce((s, g) => s + (g.pax ?? 1), 0);
             return (
               <div key={t.id} style={{ backgroundColor: C.card, borderRadius: 10, border: `1px solid ${C.line}`, overflow: "hidden" }}>
                 {/* Table header */}
@@ -757,7 +754,7 @@ function SeatingTab() {
                   <div>
                     <p style={{ margin: 0, fontWeight: 600, color: C.deep, fontSize: 14 }}>{t.label}</p>
                     <p style={{ margin: "2px 0 0", fontSize: 12, color: C.sage }}>
-                      {allInTable.length} guest{allInTable.length !== 1 ? "s" : ""}{t.note ? ` · ${t.note}` : ""}
+                      {allInTable.length} guest{allInTable.length !== 1 ? "s" : ""} · {totalPax} pax{t.note ? ` · ${t.note}` : ""}
                     </p>
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
@@ -778,7 +775,7 @@ function SeatingTab() {
           {/* Unassigned guests */}
           {(() => {
             const all = guestsByTableId.get(null) ?? [];
-            const shown = q ? all.filter(g => g.name.toLowerCase().includes(q) || g.display_name.toLowerCase().includes(q)) : all;
+            const shown = q ? all.filter(g => g.name.toLowerCase().includes(q)) : all;
             if (all.length === 0) return null;
             return (
               <div style={{ backgroundColor: C.card, borderRadius: 10, border: `1px dashed ${C.line}`, overflow: "hidden" }}>

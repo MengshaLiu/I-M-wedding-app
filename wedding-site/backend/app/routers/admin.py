@@ -103,7 +103,7 @@ def _guest_out(g: GuestList) -> GuestOut:
     return GuestOut(
         id=str(g.id),
         name=g.name,
-        display_name=g.display_name,
+        pax=g.pax,
         tier=g.tier,
         table_id=str(g.table_id) if g.table_id else None,
         table_label=g.table.label if g.table else None,
@@ -146,7 +146,7 @@ async def create_guest(
 
     guest = GuestList(
         name=body.name.strip(),
-        display_name=body.display_name.strip(),
+        pax=body.pax,
         tier=body.tier,
         table_id=table_id,
     )
@@ -183,8 +183,7 @@ async def update_guest(
 
     if body.name is not None:
         guest.name = body.name.strip()
-    if body.display_name is not None:
-        guest.display_name = body.display_name.strip()
+    guest.pax = body.pax
     if body.tier is not None:
         if body.tier not in ("full", "reception"):
             raise HTTPException(400, "tier must be 'full' or 'reception'")
@@ -252,9 +251,8 @@ async def import_guests(
 
     for idx, item in enumerate(items, start=1):
         name = item.name.strip()
-        display = item.display_name.strip()
-        if not name or not display:
-            errors.append(f"Row {idx}: name and display_name are required.")
+        if not name:
+            errors.append(f"Row {idx}: name is required.")
             skipped += 1
             continue
 
@@ -274,7 +272,7 @@ async def import_guests(
             if table_id is None:
                 errors.append(f"Row {idx} ({name}): table '{item.table_label}' not found — guest created without table assignment.")
 
-        guest = GuestList(name=name, display_name=display, tier=item.tier, table_id=table_id)
+        guest = GuestList(name=name, tier=item.tier, table_id=table_id)
         db.add(guest)
         existing_names.add(name.lower())
         created += 1
@@ -298,9 +296,9 @@ async def export_guests(
 
     buf = io.StringIO()
     writer = csv.writer(buf)
-    writer.writerow(["Name", "Display Name", "Tier", "Table"])
+    writer.writerow(["Name", "Pax", "Tier", "Table"])
     for g in rows:
-        writer.writerow([g.name, g.display_name, g.tier, g.table.label if g.table else ""])
+        writer.writerow([g.name, g.pax if g.pax is not None else "", g.tier, g.table.label if g.table else ""])
 
     buf.seek(0)
     return StreamingResponse(

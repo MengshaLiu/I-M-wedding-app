@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 
 interface SeatResult {
-  display_name: string;
+  name: string;
   table_label: string;
 }
 
@@ -181,7 +181,7 @@ export default function SeatsPageReception() {
                   fontFamily: F.cormorant, fontSize: 24, fontWeight: 500,
                   color: C.deep, margin: 0,
                 }}>
-                  {r.display_name}
+                  {r.name}
                 </p>
                 <span style={{
                   fontFamily: F.mulish, fontSize: 10, fontWeight: 600,

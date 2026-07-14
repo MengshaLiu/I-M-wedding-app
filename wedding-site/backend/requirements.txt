@@ -13,3 +13,4 @@ python-dotenv>=1.0
 pydantic-settings>=2.2
 pydantic>=2.7
 qrcode[pil]>=7.4
+psycopg2

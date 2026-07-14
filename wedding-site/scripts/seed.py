@@ -40,20 +40,20 @@ async def seed():
 
         # Guests
         guests = [
-            (uuid.uuid4(), "Alice Wong", "Alice", "full", t1),
-            (uuid.uuid4(), "Bob Tan", "Bob", "full", t1),
-            (uuid.uuid4(), "Charlie Lim", "Charlie", "full", t2),
-            (uuid.uuid4(), "Diana Lee", "Diana", "reception", t2),
-            (uuid.uuid4(), "Edward Ng", "Edward", "reception", t3),
-            (uuid.uuid4(), "Fiona Chong", "Fiona", "reception", t3),
+            (uuid.uuid4(), "Alice Wong", "full", t1),
+            (uuid.uuid4(), "Bob Tan", "full", t1),
+            (uuid.uuid4(), "Charlie Lim", "full", t2),
+            (uuid.uuid4(), "Diana Lee", "reception", t2),
+            (uuid.uuid4(), "Edward Ng", "reception", t3),
+            (uuid.uuid4(), "Fiona Chong", "reception", t3),
         ]
-        for gid, name, display, tier, table_id in guests:
+        for gid, name, tier, table_id in guests:
             await db.execute(
                 text(
-                    "INSERT INTO guest_list (id, name, display_name, tier, table_id) "
-                    "VALUES (:id, :name, :display_name, :tier, :table_id)"
+                    "INSERT INTO guest_list (id, name, tier, table_id) "
+                    "VALUES (:id, :name, :tier, :table_id)"
                 ),
-                {"id": str(gid), "name": name, "display_name": display, "tier": tier, "table_id": str(table_id)},
+                {"id": str(gid), "name": name, "tier": tier, "table_id": str(table_id)},
             )
 
         await db.commit()
