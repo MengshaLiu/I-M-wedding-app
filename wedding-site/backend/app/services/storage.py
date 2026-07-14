@@ -1,8 +1,5 @@
-import json
-
 import boto3
 from botocore.client import Config
-from botocore.exceptions import ClientError
 
 from app.config import settings
 
@@ -12,53 +9,48 @@ _client = None
 def _get_s3():
     global _client
     if _client is None:
-        _client = boto3.client(
-            "s3",
-            endpoint_url=settings.minio_endpoint,
-            aws_access_key_id=settings.minio_access_key,
-            aws_secret_access_key=settings.minio_secret_key,
+        kwargs = dict(
+            aws_access_key_id=settings.s3_access_key or None,
+            aws_secret_access_key=settings.s3_secret_key or None,
+            region_name=settings.s3_region,
             config=Config(signature_version="s3v4"),
-            region_name="us-east-1",
         )
+        _client = boto3.client("s3", **kwargs)
     return _client
 
 
-def ensure_bucket() -> None:
-    s3 = _get_s3()
-    try:
-        s3.head_bucket(Bucket=settings.minio_bucket)
-    except ClientError:
-        s3.create_bucket(Bucket=settings.minio_bucket)
+def _full_key(key: str) -> str:
+    """Prepend the configured prefix (if any) to an object key."""
+    prefix = settings.s3_key_prefix.strip("/")
+    return f"{prefix}/{key}" if prefix else key
 
-    policy = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Action": "s3:GetObject",
-                "Resource": f"arn:aws:s3:::{settings.minio_bucket}/*",
-            }
-        ],
-    }
-    s3.put_bucket_policy(Bucket=settings.minio_bucket, Policy=json.dumps(policy))
+
+def _public_base() -> str:
+    if settings.s3_public_url_base:
+        return settings.s3_public_url_base.rstrip("/")
+    return f"https://{settings.s3_bucket}.s3.{settings.s3_region}.amazonaws.com"
+
+
+def ensure_bucket() -> None:
+    # Bucket is pre-created in AWS; nothing to do here.
+    pass
 
 
 def upload(key: str, data: bytes, content_type: str) -> None:
     _get_s3().put_object(
-        Bucket=settings.minio_bucket,
-        Key=key,
+        Bucket=settings.s3_bucket,
+        Key=_full_key(key),
         Body=data,
         ContentType=content_type,
     )
 
 
 def public_url(key: str) -> str:
-    return f"{settings.minio_public_url}/{settings.minio_bucket}/{key}"
+    return f"{_public_base()}/{_full_key(key)}"
 
 
 def download(key: str) -> bytes:
-    resp = _get_s3().get_object(Bucket=settings.minio_bucket, Key=key)
+    resp = _get_s3().get_object(Bucket=settings.s3_bucket, Key=_full_key(key))
     return resp["Body"].read()
 
 
@@ -66,6 +58,6 @@ def delete_objects(keys: list[str]) -> None:
     if not keys:
         return
     _get_s3().delete_objects(
-        Bucket=settings.minio_bucket,
-        Delete={"Objects": [{"Key": k} for k in keys], "Quiet": True},
+        Bucket=settings.s3_bucket,
+        Delete={"Objects": [{"Key": _full_key(k)} for k in keys], "Quiet": True},
     )

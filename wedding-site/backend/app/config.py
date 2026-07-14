@@ -11,11 +11,15 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     session_cookie_name: str = "wss"
 
-    minio_endpoint: str = "http://minio:9000"
-    minio_access_key: str = "minioadmin"
-    minio_secret_key: str = "minioadmin"
-    minio_bucket: str = "wedding-photos"
-    minio_public_url: str = "http://localhost:9000"
+    s3_bucket: str = "im-malaysia-wedding"
+    s3_region: str = "ap-southeast-1"
+    s3_access_key: str = ""
+    s3_secret_key: str = ""
+    # Prefix prepended to every object key, e.g. "guest-uploaded-photo"
+    s3_key_prefix: str = "guest-uploaded-photo"
+    # Base URL for public object access. Leave blank to use the default
+    # virtual-hosted S3 URL: https://{bucket}.s3.{region}.amazonaws.com
+    s3_public_url_base: str = ""
 
     # Admin
     admin_username: str = "admin"
