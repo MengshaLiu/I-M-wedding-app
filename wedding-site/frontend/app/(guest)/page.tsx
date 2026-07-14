@@ -694,8 +694,8 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           Today, our two families become one, and we get to share it with the
           people who mean the most to us. Thank you for travelling near and far
           to stand by our side. Here&apos;s to red envelopes, good tea, great food,
-          and a night full of laughter.
-          <br />We&apos;re so glad you&apos;re here.
+          and a night full of laughter. 
+          <p>We&apos;re so glad you&apos;re here.</p>
         </p>
         <p style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
@@ -704,10 +704,10 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
         }}>
           今天，两个家庭合二为一，我们有幸与最重要的人共同分享这一刻。
           感谢您跋山涉水，前来见证我们的幸福。
-          愿,
+          愿, 
           红包满载, 好茶飘香
           美食不断，笑声不绝。
-          <br />很高兴今天有您共见欢喜。
+          <p>很高兴今天有您共见欢喜。</p>
         </p>
       </div>
 
