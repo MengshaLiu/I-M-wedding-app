@@ -12,6 +12,11 @@
   to { opacity: 1; }
 }
 
+/* Hide the sticky nav while the envelope intro is active.
+   Applied synchronously by an inline script in (guest)/layout.tsx
+   before first paint, so there is no flash of the nav bar. */
+html.envelope-active header { display: none !important; }
+
 @layer base {
   body {
     background-color: #f8f5e8;

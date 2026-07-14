@@ -41,6 +41,9 @@ export default async function GuestLayout({ children }: { children: React.ReactN
       { label: "Moments", href: "/moments" },
     ];
     return (
+      <>
+      {/* Runs synchronously before first paint — hides header if envelope not yet seen */}
+      <script dangerouslySetInnerHTML={{ __html: `(function(){try{if(!sessionStorage.getItem('envelope-intro-seen'))document.documentElement.classList.add('envelope-active');}catch(e){}})();` }} />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: C.bg }}>
         <header style={{
           backgroundColor: C.deep,
@@ -77,6 +80,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         </header>
         <main style={{ flex: 1 }}>{children}</main>
       </div>
+      </>
     );
   }
 

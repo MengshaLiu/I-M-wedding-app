@@ -1,20 +1,4 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: wedding
-      POSTGRES_USER: wedding
-      POSTGRES_PASSWORD: wedding
-    ports:
-      - "5434:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wedding"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
@@ -37,14 +21,13 @@ services:
       context: ./backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://wedding:wedding@postgres:5432/wedding
       MINIO_ENDPOINT: http://minio:9000
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
     depends_on:
-      postgres:
+      minio:
         condition: service_healthy
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
@@ -65,5 +48,4 @@ services:
     command: npm run dev
 
 volumes:
-  pg_data:
   minio_data:
