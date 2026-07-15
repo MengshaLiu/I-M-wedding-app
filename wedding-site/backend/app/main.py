@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -15,9 +16,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Wedding API", version="0.1.0", lifespan=lifespan)
 
+_cors_origins = ["http://localhost:3000"]
+if _site_url := os.getenv("SITE_URL"):
+    _cors_origins.append(_site_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
