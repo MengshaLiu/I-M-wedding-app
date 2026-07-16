@@ -254,7 +254,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
           letterSpacing: "0.22em", textTransform: "uppercase",
           color: C.muted, margin: "0 0 36px",
         }}>
-          Shangri-La Tanjung Aru
+          @Shangri-La Tanjung Aru
         </p>
 
         {/* Desktop: 3-col alternating  |  Mobile: left-rail single col */}
