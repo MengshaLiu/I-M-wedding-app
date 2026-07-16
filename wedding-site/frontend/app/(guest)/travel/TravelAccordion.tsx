@@ -15,7 +15,7 @@ const F = {
   dancing: "var(--font-dancing), 'Dancing Script', cursive",
 } as const;
 
-const SECTION_META: Record<string, { label: string;}> = {
+const SECTION_META: Record<string, { label: string; intro?: string }> = {
   "Places to Visit": {
     label: "explore",
     // intro: "A few of our favourite corners of Kota Kinabalu and beyond.",
