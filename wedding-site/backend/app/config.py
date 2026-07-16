@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     admin_jwt_expire_hours: int = 24
 
     # Used in QR code URLs
-    site_url: str = "http://localhost:3000"
+    site_url: str = "https://i-m-wedding-app-production.up.railway.app"
 
 
 settings = Settings()
