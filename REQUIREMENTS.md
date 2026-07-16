@@ -108,9 +108,9 @@ link to each guest; the link decides what that guest sees.
   per-file **size cap** (e.g. 10 MB), and a per-guest **rate/quantity limit**
   to control cost and abuse.
 - **F-3.4** Images are **resized/compressed** server-side; the original file, a
-  display-size version (max 1920 px, WebP, quality 85), and a thumbnail (max 800 px,
-  WebP, quality 85) are all stored. Originals are retained so the couple can
-  download them after the wedding.
+  display-size version (max 1920 px, WebP), and a thumbnail (max 400 px, WebP)
+  are all stored. Originals are retained so the couple can download them after
+  the wedding.
 - **F-3.5 Moderation:** 
   - *Auto-show* (default): photos appear immediately; couple removes anything
     unwanted. Best for a live wedding day.
@@ -144,7 +144,7 @@ You cannot run or test the public site without these. Keep it minimal but real.
     not the individual.)*
 - **F-5.2b** Manage the **guest list and tables** in a unified **Guests & Tables**
   panel:
-  - **Guest List view**: searchable table of all guests (name, pax, tier,
+  - **Guest List view**: searchable table of all guests (name, display name, tier,
     table assignment) with inline add/edit/delete.
   - **By Table view**: guests grouped under their assigned table card; unassigned
     guests shown in a separate section. Tables can be added, edited, and deleted
@@ -155,9 +155,9 @@ You cannot run or test the public site without these. Keep it minimal but real.
     Valid rows are imported; invalid rows (missing name, unknown tier, intra-file
     duplicates) are skipped and reported. Guests whose names already exist in the
     database are skipped automatically.
-    - Expected CSV columns: `name`, `tier` (full / reception, defaults to `full`),
-      `table` (optional — matched case-insensitively to an existing table label).
-      `display_name` column is no longer used and will be ignored if present.
+    - Expected CSV columns: `name`, `display_name`, `tier` (full / reception,
+      defaults to `full`), `table` (optional — matched case-insensitively to an
+      existing table label).
   - **CSV export**: download the full guest list as a `.csv` file.
 - **F-5.3** Wedding date, venue details, dress code, and timeline events are
   **code-managed** — edit `backend/app/routers/home.py` and redeploy to update
@@ -216,13 +216,8 @@ You cannot run or test the public site without these. Keep it minimal but real.
 
 ---
 
-## 7. Decisions confirmed
-
-| # | Question | Decision |
-|---|----------|----------|
-| 1 | Roughly how many guests, and expected photo volume? | 180–200 guests |
-| 2 | Multi-language needed? | No |
-| 3 | Custom domain to use? | Yes (TBC) |
-| 4 | Who will moderate the gallery during the event? | No one — auto-show; couple removes anything unwanted post-event |
-| 5 | Gallery open before the wedding day? | TBC |
-| 6 | Seat finder shows tablemates or own table only? | Own table only |
+## 7. Open questions / decisions to confirm
+1. Roughly how many guests, and expected photo volume? 180-200 guests
+2. Multi-language needed? no
+3. Custom domain to use? yes
+6. Who will moderate the gallery during the event? no one

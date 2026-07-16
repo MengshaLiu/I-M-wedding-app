@@ -44,7 +44,7 @@ checks never live only in the browser.
 | Frontend | **Next.js (App Router) + TypeScript + Tailwind CSS** | Required; Vercel-native; Route Handlers give us the BFF/cookie pattern. |
 | Backend | **Python + FastAPI + Uvicorn**, **Pydantic** models, **SQLAlchemy + Alembic** migrations | Required Python; FastAPI is async, typed, auto-documented. |
 | Database | **Postgres** | Relational fit (guests↔tables↔photos); ubiquitous managed free tiers. |
-| Object storage | **AWS S3** (`im-malaysia-wedding`, region `ap-southeast-2`) | In use; bucket prefix `guest-uploaded-photo/`. Public read policy scoped to that prefix. |
+| Object storage | **Cloudflare R2** (photos) *or* Supabase Storage | R2 has no egress fees — ideal for an image gallery. |
 | Image processing | **Pillow** (resize/compress/thumbnail) | Simple, server-side, cheap. |
 | Admin auth | FastAPI dependency + hashed admin secret (`passlib`/`bcrypt`), short-lived signed session | Real auth for the couple only. |
 
@@ -60,11 +60,14 @@ checks never live only in the browser.
     (`asia-southeast1`), pay-per-request → effectively free at this traffic.
     Slightly more setup; best pure cost.
   - *(Fly.io no longer offers a free tier to new users; skip for "cheapest".)*
-- **Database → Neon (scale-to-zero Postgres)** ✓ *in use* — serverless Postgres,
-  connects via asyncpg with `?ssl=require`.
-- **Object storage → AWS S3** ✓ *in use* — bucket `im-malaysia-wedding`,
-  region `ap-southeast-2` (Sydney), prefix `guest-uploaded-photo/`.
-  Public read via bucket policy scoped to that prefix only.
+- **Database → Supabase (Postgres + bundled Storage)** for the simplest single
+  data backend, **or Neon (scale-to-zero Postgres) + Cloudflare R2** for the
+  most cost-efficient photo-heavy setup.
+
+> **Simple default:** Vercel + Render + Supabase (DB & Storage in one place).
+> **Cost-optimal for many photos:** Vercel + Cloud Run + Neon + Cloudflare R2.
+> Note Supabase free Storage is ~1 GB — fine only if images are compressed and
+> volume is modest; R2's free allowance is far more comfortable for galleries.
 
 ---
 
@@ -94,7 +97,7 @@ wedding-site/
 │  ├─ alembic/               # migrations
 │  ├─ scripts/seed.py        # seed guests/tables/events for local dev
 │  └─ pyproject.toml
-├─ docker-compose.yml        # local: backend + frontend only (Neon + S3 used directly)
+├─ docker-compose.yml        # local: api + postgres (+ minio for S3 locally)
 └─ README.md
 ```
 
@@ -103,14 +106,15 @@ wedding-site/
 ## 4. Data model
 
 ```
-guests  (table: guest_list)
+guests
   id              uuid pk
-  name            text            -- full name; used for seat finder search and display
-  pax             int null        -- number of people this guest entry represents
+  name            text
+  display_name    text            -- shown to others (e.g. first name)
+  token           text unique     -- the invite credential (indexed)
   tier            enum('full','reception')
   table_id        uuid fk → tables.id  null
-  -- note: display_name removed; name is used everywhere
-  -- note: token/revoked/created_at not in current schema (access via shared tier links)
+  revoked         bool default false
+  created_at      timestamptz
 
 tables
   id              uuid pk
@@ -132,8 +136,8 @@ photos
   uploader_name   text
   message         text null
   original_key    text null       -- raw uploaded file (jpg/png/webp)
-  storage_key     text            -- display image (WebP, max 1920 px, quality 85)
-  thumb_key       text            -- thumbnail (WebP, max 800 px, quality 85)
+  storage_key     text            -- display image (WebP, max 1920 px)
+  thumb_key       text            -- thumbnail (WebP, max 400 px)
   status          enum('visible','hidden','pending') default 'visible'
   created_at      timestamptz
 
@@ -170,7 +174,7 @@ admins
 - `POST /api/admin/login`
 - CRUD `/api/admin/guests` (+ `GET …/export`, `POST …/import`)
   - `GET  /api/admin/guests/export` → CSV download of full guest list
-  - `POST /api/admin/guests/import` → body `[{name, tier, table_label?}]`;
+  - `POST /api/admin/guests/import` → body `[{name, display_name, tier, table_label?}]`;
     pre-loads tables for label→id resolution; skips duplicates and invalid rows;
     returns `{created, skipped, errors[]}`
 - `GET  /api/admin/invite-links` → `{full: {url, token}, reception: {url, token}}`
@@ -206,13 +210,11 @@ endpoint filters `timeline_events` by `guest.tier` server-side.
 1. Validate MIME + magic bytes (images only), enforce size cap, per-guest count
    limit (rate-limit by token).
 2. Pillow: auto-orient (EXIF), strip EXIF/GPS metadata (privacy), produce a
-   capped-resolution **display** image (max 1920 px, WebP quality 85) + a
-   **thumbnail** (max 800 px, WebP quality 85) for retina display clarity.
-3. Upload three objects to AWS S3 under the `guest-uploaded-photo/` prefix:
-   `guest-uploaded-photo/photos/{uuid}/original.{ext}` (raw bytes),
-   `guest-uploaded-photo/photos/{uuid}/display.webp`,
-   `guest-uploaded-photo/photos/{uuid}/thumb.webp`;
-   DB stores the short keys (without prefix) — prefix is added at URL generation time.
+   capped-resolution **display** image (max 1920 px) + a small **thumbnail**
+   (max 400 px), both WebP.
+3. Upload three objects to storage: `photos/{uuid}/original.{ext}` (raw bytes),
+   `photos/{uuid}/display.webp`, `photos/{uuid}/thumb.webp`; store all three
+   keys in `photos`.
 4. Serve display/thumb via storage public URLs; gallery loads thumbnails and
    lazy-loads full display images. Originals are retained for admin download.
 
@@ -224,8 +226,8 @@ endpoint filters `timeline_events` by `guest.tier` server-side.
 |-----------|---------|-------------------------------|
 | Frontend | Vercel Hobby | $0 |
 | Backend | Render (free tier) or Cloud Run (scale-to-zero) | $0 idle; ~$7 for one always-on month over the event |
-| Database | **Neon** (scale-to-zero Postgres) ✓ in use | $0 free tier |
-| Photo storage | **AWS S3** (`im-malaysia-wedding`, `ap-southeast-2`) ✓ in use | Standard S3 pricing; ~$0.023/GB/month + ~$0.005/1k PUT. At 200 guests × 10 photos × ~1 MB thumbnail ≈ $0.05 storage + cents in requests |
+| Database | Supabase free **or** Neon free | $0 (verify storage limits) |
+| Photo storage | Cloudflare R2 / Supabase Storage | $0 within free allowance; pennies beyond |
 | Domain | registrar | ~$10–15/yr (optional) |
 
 Estimated total: **$0–~$10 for the whole event**, plus an optional domain.
@@ -313,13 +315,14 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
 ### Sprint 7 — Feature optimisation
 - **Goal:** Quality-of-life improvements surfaced after initial build.
 - **Tasks:**
-  - **Original photo storage + admin download** ✓ *complete* — Raw uploaded file
-    (`original.{ext}`) stored alongside display and thumb WebP derivatives in S3.
-    Admin Photos tab: per-card "⬇ Original" link, checkbox multi-select,
-    "Download Selected (ZIP)" and "Download All (ZIP)". Backend endpoint
-    `GET /api/admin/photos/download-zip?ids=...` fetches originals from S3 and
-    returns a streaming ZIP. Migration `004` added `original_key text null` to
-    `photos`.
+  - **Original photo storage + admin download** — Store the raw uploaded file
+    (`original.{ext}`) alongside the display and thumb WebP derivatives.
+    Admin Photos tab gains: per-card "⬇ Original" link, checkbox multi-select,
+    "Download Selected (ZIP)" and "Download All (ZIP)" buttons. Backend adds
+    `GET /api/admin/photos/download-zip?ids=...` which fetches originals from
+    MinIO and returns a streaming ZIP (`ZIP_STORED`). Migration `004` adds
+    `original_key text null` to `photos`. Existing photos without an original
+    stored show no download link.
   - **Multi-photo upload UI** — Replace single-file picker with a multi-select
     input (`multiple` attribute, up to 10 files). After selection, show a
     preview grid with per-photo remove buttons and an "Add more" affordance.
@@ -350,27 +353,6 @@ done (DoD)**. Sprint 1 is the backbone — get access control right first.
   all photos appear in the gallery after a successful batch upload. Admin can
   import a guest list from CSV with preview and per-row error reporting, and can
   view/manage guests and tables in a single unified panel.
-
-### Sprint 8 — Infrastructure, data model & UX polish ✓ COMPLETE
-
-- **EnvelopeGate intro** — Full Guest home page shows an animated envelope on
-  first visit (session-gated via `sessionStorage`). Nav bar hidden during the
-  animation via synchronous inline script + CSS class. Children (page content)
-  not rendered to DOM until envelope dismissed.
-- **Dropped `display_name`** — Removed from `GuestList` model, all schemas,
-  admin CRUD, CSV import/export, seat finder, and frontend. `name` is used
-  everywhere. Migration `005` drops the column.
-- **Added `pax` field** — `GuestList.pax: int null`; shown in admin guest list
-  (Pax column) and by-table card header (`N guests · M pax`). Included in
-  add/edit form and CSV export.
-- **Switched database to Neon Postgres** — Dropped local Docker postgres.
-  `DATABASE_URL` uses asyncpg + `?ssl=require`. All migrations run against Neon.
-- **Switched photo storage to AWS S3** — Dropped MinIO. Storage service rewritten
-  to use boto3 against real AWS (no `endpoint_url`). Bucket: `im-malaysia-wedding`,
-  region: `ap-southeast-2`, prefix: `guest-uploaded-photo/`. Config settings
-  renamed `s3_*`. Docker Compose no longer includes MinIO or postgres services.
-- **Increased thumbnail quality** — `THUMB_MAX` 400 → 800 px; quality 75 → 85.
-  Covers 2× retina pixel density at card display size (~200 CSS px).
 
 ---
 

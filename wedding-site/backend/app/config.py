@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Admin
     admin_username: str = "admin"
-    admin_password: str = "wedding2026!"  # override in production
+    admin_password: str = "I&Mwedding2026!"  # override in production
     admin_cookie_name: str = "wsa"
     admin_jwt_expire_hours: int = 24
 
