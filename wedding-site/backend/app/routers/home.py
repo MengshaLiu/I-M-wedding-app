@@ -10,7 +10,7 @@ WEDDING_DATE = "Saturday, 12 September"
 VENUE_NAME = "Shangri-La Tanjung Aru"
 VENUE_ADDRESS = "No. 20, Jalan Aru, Tanjung Aru, 88100 Kota Kinabalu, Sabah, Malaysia"
 VENUE_MAP_URL = "https://maps.app.goo.gl/Q2UqWTeGjsryFikd7"
-DRESS_CODE = "Warm & Festive"
+DRESS_CODE = "Garden Formal"
 
 TIMELINE = [
     {"id": "evt-1", "starts_at": "3:30 PM", "title": "Arrival & Registration at the Pavilion", "description": "Grab a welcome drink, find your seat, and soak in the tropical breeze", "visibility": "full_only"},
