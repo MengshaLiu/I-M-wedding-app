@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface SeatResult {
   name: string;
@@ -49,11 +49,12 @@ export default function SeatsPage() {
     }
   }, []);
 
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const debouncedSearch = useCallback(
     (...args: [string]) => {
-      let timer: ReturnType<typeof setTimeout>;
-      clearTimeout(timer);
-      timer = setTimeout(() => search(...args), 300);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => search(...args), 300);
     },
     [search]
   );
