@@ -71,6 +71,12 @@ TRAVEL_CONTENT = [
                 tip="The signature Roasted Chicken Rice is the must-order — juicy, flavourful, and consistently good. The Honey Sesame Chicken is another crowd favourite worth trying if you want something a little different.",
                 link="https://www.google.com/maps/search/A1+Chicken+Rice+Lintas+Plaza+Kota+Kinabalu",
             ),
+            TravelItem(
+                name="KK Durian Paradise",
+                description="If you've never tried durian, Kota Kinabalu is one of the best places to do it — and KK Durian Paradise is where the locals go. This open-air durian stall is a beloved institution, drawing crowds of durian devotees who come to feast on Sabah's finest varieties straight from the husk. The passionate team knows their fruit inside out and will happily help you pick the right variety for your palate — from creamy and bittersweet to rich and custard-like. Eating durian here, under the night sky with cold coconut water in hand, is a quintessentially Sabahan experience.",
+                tip="Go with an open mind — durian is an acquired taste, but the right variety can be a revelation. Ask the staff to recommend something mild if it's your first time. Best enjoyed in the evening when it's cooler.",
+                link="https://www.google.com/maps/search/KK+Durian+Paradise+Kota+Kinabalu",
+            ),
         ],
     ),
     TravelSection(
