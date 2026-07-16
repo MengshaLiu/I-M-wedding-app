@@ -246,8 +246,15 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
         }}>
           The Day
         </h2>
-        <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px, 5vw, 24px)", color: C.sage, margin: "0 0 40px" }}>
+        <p style={{ fontFamily: F.dancing, fontSize: "clamp(20px, 5vw, 24px)", color: C.sage, margin: "0 0 12px" }}>
           a little timeline
+        </p>
+        <p style={{
+          fontFamily: F.mulish, fontSize: 12, fontWeight: 500,
+          letterSpacing: "0.22em", textTransform: "uppercase",
+          color: C.muted, margin: "0 0 36px",
+        }}>
+          Shangri-La Tanjung Aru
         </p>
 
         {/* Desktop: 3-col alternating  |  Mobile: left-rail single col */}
