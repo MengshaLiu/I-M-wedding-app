@@ -16,7 +16,7 @@ class MeResponse(BaseModel):
 
 class TimelineEventOut(BaseModel):
     id: str
-    starts_at: str
+    starts_at: str | None = None
     title: str
     description: str
 

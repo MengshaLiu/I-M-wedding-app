@@ -50,7 +50,7 @@ function LeafDivider({ py = 48 }: { py?: number }) {
 
 function FullGuestHome({ data }: { data: Record<string, unknown> }) {
   const timeline = (data.timeline as Array<{
-    id: string; starts_at: string; title: string; description: string;
+    id: string; starts_at: string | null; title: string; description: string;
   }>) ?? [];
 
   return (
@@ -462,7 +462,7 @@ function DoubleHappinessDivider() {
 
 function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
   const timeline = (data.timeline as Array<{
-    id: string; starts_at: string; title: string; description: string;
+    id: string; starts_at: string | null; title: string; description: string;
   }>) ?? [];
 
   return (
