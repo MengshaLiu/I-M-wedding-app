@@ -57,13 +57,9 @@ export default async function GuestLayout({ children }: { children: React.ReactN
             maxWidth: 720, margin: "0 auto", padding: "14px 20px",
             display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
-            <Link href="/" style={{
-              fontFamily: F.cormorant,
-              fontSize: 22, fontWeight: 500,
-              color: C.line, textDecoration: "none",
-              letterSpacing: "0.05em",
-            }}>
-              I &amp; M
+            <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/wedding/logo.png" alt="I & M" style={{ height: 105, width: "auto", mixBlendMode: "screen" }} />
             </Link>
             <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
               {links.map(({ label, href }) => (
@@ -107,13 +103,9 @@ export default async function GuestLayout({ children }: { children: React.ReactN
           maxWidth: 720, margin: "0 auto", padding: "14px 20px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <Link href="/" style={{
-            fontFamily: F.cormorant,
-            fontSize: 22, fontWeight: 500,
-            color: RC.cream, textDecoration: "none",
-            letterSpacing: "0.05em",
-          }}>
-            I &amp; M
+          <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/wedding/logo.png" alt="I & M" style={{ height: 105, width: "auto", mixBlendMode: "screen" }} />
           </Link>
           <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
             {receptionLinks.map(({ label, chinese, href }) => (

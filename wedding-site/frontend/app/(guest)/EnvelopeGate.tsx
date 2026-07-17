@@ -35,6 +35,13 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
     setTimeout(() => setShowContent(true), 900);
   }
 
+  // After the flap opens, auto-dismiss to load the home page
+  useEffect(() => {
+    if (!opened) return;
+    const t = setTimeout(dismiss, 300);
+    return () => clearTimeout(t);
+  }, [opened]);
+
   if (!mounted) return null;
   if (showContent) return <>{children}</>;
 
@@ -55,7 +62,7 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
         }
         @keyframes sealGlow {
           0%, 100% { box-shadow: 0 6px 20px rgba(0,0,0,0.32); }
-          55%       { box-shadow: 0 6px 20px rgba(0,0,0,0.32), 0 0 0 10px rgba(199,162,75,0.13), 0 0 0 20px rgba(199,162,75,0.05); }
+          55%       { box-shadow: 0 6px 20px rgba(0,0,0,0.32), 0 0 0 10px rgba(255,255,255,0.10), 0 0 0 20px rgba(255,255,255,0.04); }
         }
       `}</style>
 
@@ -95,14 +102,14 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
             fontFamily: "var(--font-great-vibes), 'Great Vibes', cursive",
             fontSize: "clamp(56px, 17vw, 80px)",
             fontWeight: 400,
-            color: "oklch(30% .065 152)",
             lineHeight: 1.08,
             margin: 0,
             letterSpacing: "-0.01em",
           }}>
-            Ivan &amp;
+            <span style={{ color: "oklch(36% .072 152)" }}>Ivan</span>{" "}
+            <span style={{ color: "oklch(55% .09 150)" }}>&amp;</span>
             <br />
-            Mengsha
+            <span style={{ color: "oklch(36% .072 152)" }}>Mengsha</span>
           </h1>
         </div>
 
@@ -112,76 +119,6 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
           width: "100%",
           maxWidth: 380,
         }}>
-
-          {/* Card — absolutely positioned above the envelope, rises on open.
-              opacity: 0 + pointerEvents: none when closed keeps it invisible
-              and prevents it from intercepting clicks on the envelope. */}
-          <div style={{
-            position: "absolute",
-            top: 0,
-            left: 14, right: 14,
-            zIndex: 10,
-            backgroundColor: "#fdf9f2",
-            borderRadius: "4px 4px 0 0",
-            padding: "28px 22px 24px",
-            textAlign: "center",
-            boxShadow: "0 -3px 24px rgba(60,80,50,0.09)",
-            /* closed: sits 60px inside envelope from top (hidden behind flap)
-               open:   rises to 10px above the envelope top              */
-            transform: opened ? "translateY(calc(-100% - 10px))" : "translateY(60px)",
-            opacity: opened ? 1 : 0,
-            pointerEvents: opened ? "auto" : "none",
-            transition: "transform 0.7s cubic-bezier(0.34, 1.28, 0.64, 1) 0.32s, opacity 0.45s ease 0.32s",
-          }}>
-            <p style={{
-              fontFamily: "var(--font-mulish), Mulish, sans-serif",
-              fontSize: 9, fontWeight: 600, letterSpacing: "0.42em",
-              textTransform: "uppercase", color: "oklch(0.5 0.04 150)",
-              margin: "0 0 10px",
-            }}>
-              The Wedding of
-            </p>
-            <h2 style={{
-              fontFamily: "var(--font-great-vibes), 'Great Vibes', cursive",
-              fontSize: 38, fontWeight: 400,
-              color: "oklch(36% .072 152)", lineHeight: 1.15,
-              margin: "0 0 14px",
-            }}>
-              Ivan &amp; Mengsha
-            </h2>
-            <div style={{
-              width: 44, height: 1,
-              backgroundColor: "oklch(0.82 0.03 140)",
-              margin: "0 auto 12px",
-            }} />
-            <p style={{
-              fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
-              fontSize: 15, letterSpacing: "0.04em",
-              color: "oklch(36% .072 152)", margin: "0 0 3px",
-            }}>
-              Saturday, 12 September 2026
-            </p>
-            <p style={{
-              fontFamily: "var(--font-mulish), Mulish, sans-serif",
-              fontSize: 10, letterSpacing: "0.1em",
-              color: "oklch(0.5 0.04 150)", margin: "0 0 22px",
-            }}>
-              Kota Kinabalu, Sabah, Malaysia
-            </p>
-            <button
-              onClick={dismiss}
-              style={{
-                fontFamily: "var(--font-mulish), Mulish, sans-serif",
-                fontSize: 10, fontWeight: 600,
-                letterSpacing: "0.22em", textTransform: "uppercase",
-                color: "#f8f5e8", backgroundColor: "#59745B",
-                border: "none", borderRadius: 20,
-                padding: "11px 30px", cursor: "pointer",
-              }}
-            >
-              Enter the site →
-            </button>
-          </div>
 
           {/* ── Envelope ── */}
           <div
@@ -266,7 +203,7 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
             <div style={{
               position: "absolute",
               top: "50%", left: "50%",
-              width: 72, height: 72,
+              width: 84, height: 84,
               zIndex: 4,
               transform: `translate(-50%, -50%) scale(${opened ? 0.2 : 1})`,
               opacity: opened ? 0 : 1,
@@ -279,14 +216,8 @@ export default function EnvelopeGate({ children }: { children: React.ReactNode }
               animation: opened ? undefined : "sealGlow 3s ease-in-out infinite 2s",
             }}>
               <div style={{ position: "absolute", inset: 5, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.18)", boxShadow: "inset 0 0 4px rgba(0,0,0,0.2)" }} />
-              <span style={{
-                fontFamily: "var(--font-great-vibes), 'Great Vibes', cursive",
-                fontSize: 22, fontWeight: 400,
-                color: "rgba(50,28,4,0.82)",
-                lineHeight: 1, position: "relative",
-              }}>
-                I&amp;M
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/wedding/logo.png" alt="I & M" style={{ width: "82%", height: "82%", objectFit: "contain", mixBlendMode: "screen", position: "relative" }} />
             </div>
           </div>
         </div>
