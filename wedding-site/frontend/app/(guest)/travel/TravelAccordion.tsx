@@ -44,7 +44,7 @@ const SECTION_META: Record<string, { label: string; intro?: string }> = {
 
 const FALLBACK_LABELS = ["explore", "taste", "unwind", "prepare", "discover"];
 
-interface TravelItem { name: string; description: string; tip?: string | null; link?: string | null; }
+interface TravelItem { name: string; description: string; tip?: string | null; link?: string | null; ios_link?: string | null; android_link?: string | null; }
 interface TravelSection { title: string; items: TravelItem[]; }
 
 export function TravelAccordion({ sections }: { sections: TravelSection[] }) {
@@ -188,11 +188,55 @@ export function TravelAccordion({ sections }: { sections: TravelSection[] }) {
                           paddingBottom: 1,
                         }}
                       >
-                        View on Google Maps
+                        {item.link.includes("google.com/maps") ? "View on Google Maps" : "Visit Website"}
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                           <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </a>
+                    )}
+                    {(item.ios_link || item.android_link) && (
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: item.tip ? 10 : 0 }}>
+                        {item.ios_link && (
+                          <a
+                            href={item.ios_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: 6,
+                              fontFamily: F.mulish, fontSize: 12, fontWeight: 600,
+                              letterSpacing: "0.06em", textTransform: "uppercase",
+                              color: C.sage, textDecoration: "none",
+                              border: `1px solid oklch(0.75 0.07 150)`,
+                              borderRadius: 6, padding: "5px 11px",
+                            }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                            </svg>
+                            App Store
+                          </a>
+                        )}
+                        {item.android_link && (
+                          <a
+                            href={item.android_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: 6,
+                              fontFamily: F.mulish, fontSize: 12, fontWeight: 600,
+                              letterSpacing: "0.06em", textTransform: "uppercase",
+                              color: C.sage, textDecoration: "none",
+                              border: `1px solid oklch(0.75 0.07 150)`,
+                              borderRadius: 6, padding: "5px 11px",
+                            }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M17.523 15.341 20 11l-2.477-4.341A1 1 0 0 0 16.634 6H7.366a1 1 0 0 0-.889.659L4 11l2.477 4.341A1 1 0 0 0 7.366 16h9.268a1 1 0 0 0 .889-.659zM8.5 13a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm7 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                            </svg>
+                            Google Play
+                          </a>
+                        )}
+                      </div>
                     )}
                   </div>
                 ))}

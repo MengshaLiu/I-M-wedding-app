@@ -61,7 +61,7 @@ export default async function TravelPage() {
           fontFamily: F.dancing, fontSize: "clamp(22px, 5vw, 30px)",
           color: C.sage, margin: "0 0 2px",
         }}>
-          Explore Kota Kinabalu
+          Welcome to Sabah
         </p>
         <h1 style={{
           fontFamily: F.cormorant, fontSize: "clamp(48px, 10vw, 68px)",
@@ -76,6 +76,26 @@ export default async function TravelPage() {
           A little guide to help you make the most of your time in Sabah, Malaysia.{" "}
           We can&apos;t wait to show you this part of the world.
         </p>
+      </div>
+
+      {/* ── Moodboard ── */}
+      <div className="moodboard-wrap" style={{
+        width: "100%", maxWidth: 720, margin: "44px auto 0",
+        padding: "0 24px",
+        position: "relative", zIndex: 1,
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/wedding/sabah-moodboard.jpg"
+          alt="Explore Sabah — a moodboard of Kota Kinabalu highlights"
+          className="moodboard-img"
+          style={{
+            width: "100%", height: "auto", display: "block",
+            borderRadius: 18,
+            boxShadow: "0 4px 32px oklch(0.36 0.07 152 / 0.12), 0 1px 6px oklch(0.36 0.07 152 / 0.08)",
+            filter: "sepia(0.08) saturate(0.95) brightness(1.01)",
+          }}
+        />
       </div>
 
       {/* ── Accordion ── */}

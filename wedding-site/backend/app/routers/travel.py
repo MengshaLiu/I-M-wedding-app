@@ -14,27 +14,31 @@ TRAVEL_CONTENT = [
                 name="Gaya Street",
                 description="One of KK's oldest and most characterful streets, Gaya Street is lined with heritage shophouses housing a eclectic mix of local cafes, provision shops, pharmacies, and traders that have been serving the community for generations. Its unhurried, old-town atmosphere makes it one of the most authentic corners of the city.",
                 tip="The famous Sunday Market takes over Gaya Street every week — go early as stalls start packing up by midday.",
+                link="https://www.google.com/maps/search/Gaya+Street+Kota+Kinabalu",
             ),
             TravelItem(
                 name="Kota Kinabalu City Mosque",
                 description="One of Malaysia's most beautiful mosques, set beside a lagoon. The golden domes glow magnificently at sunset.",
                 tip="Visit at dusk for golden reflections on the water.",
+                link="https://www.google.com/maps/search/Kota+Kinabalu+City+Mosque",
             ),
             TravelItem(
                 name="Rafflesia Information Centre",
                 description="Dedicated to one of the world's most extraordinary flowers, this centre sits within the rainforest outside KK and serves as the starting point for guided walks in search of the rare Rafflesia — the largest bloom on earth, known for its striking crimson petals and remarkable size. Informative displays explain the flower's unique parasitic nature and the conservation efforts protecting it across Sabah.",
                 tip="Rafflesia blooms are unpredictable and last only 5–7 days — call ahead to confirm there is an active bloom before making the trip out.",
+                link="https://www.google.com/maps/search/Rafflesia+Information+Centre+Kota+Kinabalu+Sabah",
             ),
-            
             TravelItem(
                 name="Kinabalu Park",
                 description="UNESCO World Heritage Site and home to Mt Kinabalu (4,095 m), Southeast Asia's highest peak.",
                 tip="Book a guided summit trek well in advance — permits fill months ahead.",
+                link="https://www.google.com/maps/search/Kinabalu+Park+Sabah",
             ),
             TravelItem(
                 name="Mari Mari Cultural Village",
                 description="A living open-air museum where guides from Sabah's indigenous communities demonstrate traditional food, music, dance, and blowpipe skills.",
                 tip="The afternoon session ends with a lively cultural show — worth timing your visit around it.",
+                link="https://www.google.com/maps/search/Mari+Mari+Cultural+Village+Kota+Kinabalu",
             )
         ],
     ),
@@ -120,11 +124,13 @@ TRAVEL_CONTENT = [
                 name="Island Hopping & Snorkelling",
                 description="Hop between the five islands of Tunku Abdul Rahman Marine Park — white sand, coral reefs, and clear turquoise water just a short boat ride from the city.",
                 tip="Mantanani Island and Manukan Island are highly recommended for a day trip.",
+                link="https://www.google.com/maps/search/Tunku+Abdul+Rahman+Marine+Park+Kota+Kinabalu",
             ),
             TravelItem(
                 name="Sunset at Tanjung Aru",
                 description="The west-facing beach at Tanjung Aru serves up some of the most celebrated sunsets in all of Malaysia. Our venue sits right on this stretch.",
                 tip="Come early for a beach walk before the sky turns — it peaks fast.",
+                link="https://www.google.com/maps/search/Tanjung+Aru+Beach+Kota+Kinabalu",
             ),
             TravelItem(
                 name="Bongawan River Cruise — Proboscis Monkey & Fireflies Mangrove",
@@ -145,6 +151,7 @@ TRAVEL_CONTENT = [
                 name="Malaysia Digital Arrival Card (MDAC)",
                 description="All foreign visitors must register at imigresen-online.imi.gov.my within 3 days before arrival. It is free and mandatory.",
                 tip="Takes about 5 minutes — fill it in on the plane or at your accommodation.",
+                link="https://imigresen-online.imi.gov.my/mdac/main",
             ),
             TravelItem(
                 name="Passport Validity",
@@ -165,6 +172,8 @@ TRAVEL_CONTENT = [
                 name="Getting Around — Download Grab",
                 description="Grab is the go-to ride-hailing app across KK and all of Malaysia. Set it up before you land for easy, cashless travel from the airport and around the city. Grab Food is also great for ordering takeaway delivered straight to your hotel room.",
                 tip="Add a card or top up GrabPay in the app before you arrive — it's faster than paying cash per ride and works seamlessly for food delivery too.",
+                ios_link="https://apps.apple.com/app/grab-superapp/id647268330",
+                android_link="https://play.google.com/store/apps/details?id=com.grabtaxi.passenger",
             ),
         ],
     ),

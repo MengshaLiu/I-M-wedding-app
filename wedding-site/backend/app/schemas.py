@@ -155,6 +155,8 @@ class TravelItem(BaseModel):
     description: str
     tip: str | None = None
     link: str | None = None
+    ios_link: str | None = None
+    android_link: str | None = None
 
 
 class TravelSection(BaseModel):
