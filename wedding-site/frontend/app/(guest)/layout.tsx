@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
 
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
@@ -31,6 +32,8 @@ async function getTier(): Promise<string | null> {
 
 export default async function GuestLayout({ children }: { children: React.ReactNode }) {
   const tier = await getTier();
+  if (!tier) redirect("/login");
+
   const isFullGuest = tier === "full";
 
   if (isFullGuest) {
