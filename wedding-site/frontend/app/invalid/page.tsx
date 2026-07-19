@@ -13,10 +13,10 @@ export default function InvalidPage() {
         <p className="text-sm text-gray-400">
           Contact:{" "}
           <a
-            href="mailto:hello@example.com"
+            href="mailto:ivanchua.australia@gmail.com"
             className="underline hover:text-sage transition-colors"
           >
-            hello@example.com
+            ivanchua.australia@gmail.com
           </a>
         </p>
       </div>
