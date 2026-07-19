@@ -306,7 +306,7 @@ export default function MomentsPageReception() {
                       <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
                       <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
                       <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "2px 0 0" }}>点击选择照片</p>
-                      <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 10 MB each · up to {MAX_FILES} photos</p>
+                      <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 20 MB each · up to {MAX_FILES} photos</p>
                     </div>
                   ) : (
                     <div>
