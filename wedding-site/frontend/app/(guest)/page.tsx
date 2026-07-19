@@ -493,7 +493,7 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           fontSize: "clamp(36px, 10vw, 56px)",
           margin: "0 0 8px", lineHeight: 1.15, letterSpacing: "0.05em",
         }}>
-          <span style={{ color: RC.red }}>蔡昭文</span>{" "}
+          <span style={{ color: RC.red }}>蔡昭汶</span>{" "}
           <span style={{ color: RC.gold }}>&amp;</span>{" "}
           <span style={{ color: RC.red }}>刘梦莎</span>
         </p>
