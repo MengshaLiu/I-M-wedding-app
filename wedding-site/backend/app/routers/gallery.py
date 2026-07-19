@@ -1,7 +1,7 @@
 import asyncio
 import uuid
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -117,3 +117,23 @@ async def upload_photo(
         thumb_url=storage.public_url(thumb_key_str),
         created_at=photo.created_at.isoformat(),
     )
+
+
+@router.delete("/moments/{photo_id}", status_code=204)
+async def hide_photo(
+    photo_id: str,
+    _tier: str = Depends(get_current_tier),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        pid = uuid.UUID(photo_id)
+    except ValueError:
+        raise HTTPException(400, "Invalid photo_id")
+
+    photo = (await db.execute(select(Photo).where(Photo.id == pid))).scalar_one_or_none()
+    if not photo:
+        raise HTTPException(404, "Photo not found")
+
+    photo.status = "hidden"
+    await db.commit()
+    return Response(status_code=204)

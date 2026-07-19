@@ -39,6 +39,9 @@ export default function MomentsPageReception() {
 
   const [showModal, setShowModal] = useState(false);
   const [lightbox, setLightbox] = useState<Photo | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Photo | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showUploadConfirm, setShowUploadConfirm] = useState(false);
 
   interface FileEntry { file: File; preview: string; }
   const MAX_FILES = 10;
@@ -88,6 +91,7 @@ export default function MomentsPageReception() {
     fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
     setFileEntries([]);
     setUploadError(""); setUploadProgress("");
+    setShowUploadConfirm(false);
     setShowModal(true);
   }
 
@@ -95,12 +99,28 @@ export default function MomentsPageReception() {
     fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
     setFileEntries([]);
     setUploadError(""); setUploadProgress("");
+    setShowUploadConfirm(false);
     setShowModal(false);
   }
 
-  async function handleUpload(e: React.FormEvent) {
-    e.preventDefault();
-    if (!fileEntries.length || !uploaderName.trim()) return;
+  async function handleDelete() {
+    if (!confirmDelete || deleting) return;
+    setDeleting(true);
+    const id = confirmDelete.id;
+    try {
+      const res = await fetch(`/api/moments/${id}`, { method: "DELETE" });
+      if (res.ok || res.status === 204) {
+        setPhotos(prev => prev.filter(p => p.id !== id));
+        setTotal(t => t - 1);
+        if (lightbox?.id === id) setLightbox(null);
+      }
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(null);
+    }
+  }
+
+  async function doUpload() {
     setUploading(true);
     setUploadError("");
     const uploaded: Photo[] = [];
@@ -128,6 +148,12 @@ export default function MomentsPageReception() {
     setTotal(t => t + uploaded.length);
     setUploading(false);
     closeModal();
+  }
+
+  function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!fileEntries.length || !uploaderName.trim()) return;
+    setShowUploadConfirm(true);
   }
 
   const hasMore = photos.length < total;
@@ -196,6 +222,16 @@ export default function MomentsPageReception() {
                 className="photo-card-r"
                 onClick={() => setLightbox(p)}
               >
+                <button
+                  type="button"
+                  className="card-delete-btn-r"
+                  onClick={e => { e.stopPropagation(); setConfirmDelete(p); }}
+                  title="Remove photo"
+                >
+                  <svg width="11" height="12" viewBox="0 0 11 12" fill="currentColor">
+                    <path d="M3.5 0h4l.5.5H9.5v1h-8V.5H3L3.5 0zM1 2.5h9L9.3 10a1 1 0 0 1-1 .9H2.7a1 1 0 0 1-1-.9L1 2.5z"/>
+                  </svg>
+                </button>
                 <div className="card-img-wrap-r">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.thumb_url} alt={`Photo by ${p.uploader_name}`} className="card-img-r" />
@@ -248,122 +284,203 @@ export default function MomentsPageReception() {
               border: "none", cursor: "pointer", fontSize: 20, color: C.muted,
             }}>✕</button>
 
-            <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.red, margin: "0 0 2px" }}>share your photos</p>
-            <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, letterSpacing: "0.15em", margin: "0 0 6px" }}>分享您的照片</p>
-            <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 4px" }}>
-              Upload · <span style={{ fontFamily: ZH, fontSize: 22 }}>上传</span>
-            </h2>
-            <div style={{ height: 16 }} />
+            {!showUploadConfirm ? (
+              <>
+                <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.red, margin: "0 0 2px" }}>share your photos</p>
+                <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, letterSpacing: "0.15em", margin: "0 0 6px" }}>分享您的照片</p>
+                <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 4px" }}>
+                  Upload · <span style={{ fontFamily: ZH, fontSize: 22 }}>上传</span>
+                </h2>
+                <div style={{ height: 16 }} />
 
-            <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* File picker / previews */}
-              {fileEntries.length === 0 ? (
-                <div
-                  onClick={() => fileRef.current?.click()}
-                  style={{
-                    border: `1.5px dashed ${C.line}`, borderRadius: 12, padding: "28px 16px",
-                    textAlign: "center", cursor: "pointer", backgroundColor: "rgba(255,255,255,0.5)",
-                  }}
-                >
-                  <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
-                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
-                  <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "2px 0 0" }}>点击选择照片</p>
-                  <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 10 MB each · up to {MAX_FILES} photos</p>
-                </div>
-              ) : (
-                <div>
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
-                    gap: 8,
-                  }}>
-                    {fileEntries.map((entry, i) => (
-                      <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={entry.preview} alt={`Photo ${i + 1}`} style={{
-                          width: "100%",
-                          height: fileEntries.length === 1 ? 200 : 90,
-                          objectFit: "cover", display: "block",
-                        }} />
-                        <button
-                          type="button" onClick={() => removeFile(i)}
-                          style={{
-                            position: "absolute", top: 4, right: 4,
-                            width: 22, height: 22, borderRadius: "50%",
-                            background: "rgba(0,0,0,0.55)", border: "none",
-                            color: "#fff", fontSize: 12, cursor: "pointer",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                          }}
-                        >✕</button>
-                      </div>
-                    ))}
-                  </div>
-                  {fileEntries.length < MAX_FILES && (
-                    <button
-                      type="button" onClick={() => fileRef.current?.click()}
+                <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* File picker / previews */}
+                  {fileEntries.length === 0 ? (
+                    <div
+                      onClick={() => fileRef.current?.click()}
                       style={{
-                        marginTop: 8, width: "100%", padding: "8px",
-                        border: `1px dashed ${C.line}`, borderRadius: 8,
-                        background: "transparent", cursor: "pointer",
-                        fontSize: 12, color: C.red, fontFamily: F.mulish,
+                        border: `1.5px dashed ${C.line}`, borderRadius: 12, padding: "28px 16px",
+                        textAlign: "center", cursor: "pointer", backgroundColor: "rgba(255,255,255,0.5)",
                       }}
                     >
-                      + Add more · 继续添加 ({fileEntries.length}/{MAX_FILES})
-                    </button>
+                      <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
+                      <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
+                      <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "2px 0 0" }}>点击选择照片</p>
+                      <p style={{ fontSize: 11, color: C.muted, margin: "6px 0 0" }}>JPEG, PNG or WebP · max 10 MB each · up to {MAX_FILES} photos</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
+                        gap: 8,
+                      }}>
+                        {fileEntries.map((entry, i) => (
+                          <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={entry.preview} alt={`Photo ${i + 1}`} style={{
+                              width: "100%",
+                              height: fileEntries.length === 1 ? 200 : 90,
+                              objectFit: "cover", display: "block",
+                            }} />
+                            <button
+                              type="button" onClick={() => removeFile(i)}
+                              style={{
+                                position: "absolute", top: 4, right: 4,
+                                width: 22, height: 22, borderRadius: "50%",
+                                background: "rgba(0,0,0,0.55)", border: "none",
+                                color: "#fff", fontSize: 12, cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                              }}
+                            >✕</button>
+                          </div>
+                        ))}
+                      </div>
+                      {fileEntries.length < MAX_FILES && (
+                        <button
+                          type="button" onClick={() => fileRef.current?.click()}
+                          style={{
+                            marginTop: 8, width: "100%", padding: "8px",
+                            border: `1px dashed ${C.line}`, borderRadius: 8,
+                            background: "transparent", cursor: "pointer",
+                            fontSize: 12, color: C.red, fontFamily: F.mulish,
+                          }}
+                        >
+                          + Add more · 继续添加 ({fileEntries.length}/{MAX_FILES})
+                        </button>
+                      )}
+                    </div>
                   )}
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-                multiple style={{ display: "none" }} onChange={handleFileChange} />
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+                    multiple style={{ display: "none" }} onChange={handleFileChange} />
 
-              <input
-                type="text" required placeholder="Your name · 您的姓名 *"
-                value={uploaderName} onChange={e => setUploaderName(e.target.value)}
-                style={{
-                  border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
-                  fontSize: 14, fontFamily: F.mulish, color: C.deep,
-                  backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
-                }}
-              />
+                  <input
+                    type="text" required placeholder="Your name · 您的姓名 *"
+                    value={uploaderName} onChange={e => setUploaderName(e.target.value)}
+                    style={{
+                      border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
+                      fontSize: 14, fontFamily: F.mulish, color: C.deep,
+                      backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
+                    }}
+                  />
 
-              <textarea
-                placeholder="Add a wish or message · 添加祝福语（可选，所有照片共用）"
-                value={message} onChange={e => setMessage(e.target.value)}
-                rows={3}
-                style={{
-                  border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
-                  fontSize: 13, fontFamily: F.mulish, color: C.deep,
-                  backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
-                  resize: "none",
-                }}
-              />
+                  <textarea
+                    placeholder="Add a wish or message · 添加祝福语（可选，所有照片共用）"
+                    value={message} onChange={e => setMessage(e.target.value)}
+                    rows={3}
+                    style={{
+                      border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
+                      fontSize: 13, fontFamily: F.mulish, color: C.deep,
+                      backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
+                      resize: "none",
+                    }}
+                  />
 
-              {uploadError && (
-                <p style={{ fontSize: 12, color: C.red, margin: 0 }}>{uploadError}</p>
-              )}
+                  <button type="submit" disabled={!fileEntries.length || !uploaderName.trim()}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.25em", textTransform: "uppercase",
+                      color: C.btnText, backgroundColor: C.btnBg,
+                      padding: "12px 24px", border: "none", cursor: "pointer",
+                      borderRadius: 20, opacity: (!fileEntries.length || !uploaderName.trim()) ? 0.5 : 1,
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                      width: "100%",
+                    }}>
+                    <span>{fileEntries.length > 1 ? `Share ${fileEntries.length} Photos` : "Share Photo"}</span>
+                    <span style={{ fontFamily: ZH, fontSize: 11, letterSpacing: "0.1em", textTransform: "none" }}>分享照片</span>
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.red, margin: "0 0 2px" }}>almost there</p>
+                <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, letterSpacing: "0.15em", margin: "0 0 6px" }}>即将分享</p>
+                <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 20px" }}>
+                  Share {fileEntries.length} Photo{fileEntries.length !== 1 ? "s" : ""}?
+                </h2>
 
-              <button type="submit" disabled={!fileEntries.length || !uploaderName.trim() || uploading}
-                style={{
-                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
-                  letterSpacing: "0.25em", textTransform: "uppercase",
-                  color: C.btnText, backgroundColor: C.btnBg,
-                  padding: "12px 24px", border: "none", cursor: "pointer",
-                  borderRadius: 20, opacity: (!fileEntries.length || !uploaderName.trim() || uploading) ? 0.5 : 1,
-                  display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-                  width: "100%",
+                {/* Thumbnail preview */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
+                  gap: 6, marginBottom: 16,
                 }}>
-                <span>
-                  {uploading
-                    ? uploadProgress
-                    : fileEntries.length > 1
-                      ? `Share ${fileEntries.length} Photos`
-                      : "Share Photo"}
-                </span>
-                <span style={{ fontFamily: ZH, fontSize: 11, letterSpacing: "0.1em", textTransform: "none" }}>
-                  {uploading ? "上传中…" : "分享照片"}
-                </span>
-              </button>
-            </form>
+                  {fileEntries.slice(0, 6).map((entry, i) => (
+                    <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={entry.preview} alt="" style={{
+                        width: "100%",
+                        height: fileEntries.length === 1 ? 160 : 72,
+                        objectFit: "cover", display: "block",
+                      }} />
+                      {i === 5 && fileEntries.length > 6 && (
+                        <div style={{
+                          position: "absolute", inset: 0,
+                          background: "rgba(0,0,0,0.55)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <span style={{ color: "#fff", fontSize: 16, fontFamily: F.mulish, fontWeight: 600 }}>
+                            +{fileEntries.length - 5}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{ fontFamily: F.dancing, fontSize: 18, color: C.deep, margin: "0 0 2px" }}>
+                  by {uploaderName}
+                </p>
+                {message.trim() ? (
+                  <p style={{ fontSize: 12, color: C.muted, margin: "0 0 20px", lineHeight: 1.6, fontStyle: "italic", fontFamily: F.mulish }}>
+                    &ldquo;{message.trim()}&rdquo;
+                  </p>
+                ) : (
+                  <div style={{ height: 20 }} />
+                )}
+
+                {uploadError && (
+                  <p style={{ fontSize: 12, color: C.red, margin: "0 0 12px" }}>{uploadError}</p>
+                )}
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowUploadConfirm(false); setUploadError(""); }}
+                    disabled={uploading}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.2em", textTransform: "uppercase",
+                      color: C.deep, backgroundColor: "transparent",
+                      border: `1.5px solid ${C.line}`, padding: "12px 0",
+                      cursor: "pointer", borderRadius: 20, flex: 1,
+                      opacity: uploading ? 0.45 : 1,
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={doUpload}
+                    disabled={uploading}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.25em", textTransform: "uppercase",
+                      color: C.btnText, backgroundColor: C.btnBg,
+                      padding: "12px 0", border: "none", cursor: "pointer",
+                      borderRadius: 20, flex: 2,
+                      opacity: uploading ? 0.7 : 1,
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                    }}
+                  >
+                    <span>{uploading ? uploadProgress : "Confirm & Share"}</span>
+                    <span style={{ fontFamily: ZH, fontSize: 10, letterSpacing: "0.1em", textTransform: "none" }}>
+                      {uploading ? "上传中…" : "确认分享"}
+                    </span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -388,12 +505,81 @@ export default function MomentsPageReception() {
                 {lightbox.message}
               </p>
             )}
+            <button
+              onClick={e => { e.stopPropagation(); setConfirmDelete(lightbox); }}
+              style={{
+                marginTop: 16, background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.55)", padding: "7px 20px",
+                borderRadius: 20, cursor: "pointer", fontSize: 11,
+                fontFamily: F.mulish, letterSpacing: "0.15em",
+                textTransform: "uppercase",
+              }}
+            >
+              Remove photo
+            </button>
           </div>
           <button onClick={() => setLightbox(null)} style={{
             position: "fixed", top: 16, right: 16, background: "rgba(255,255,255,0.12)",
             border: "none", cursor: "pointer", fontSize: 18, color: "#fff",
             width: 36, height: 36, borderRadius: "50%",
           }}>✕</button>
+        </div>
+      )}
+
+      {/* ── Confirm delete ── */}
+      {confirmDelete && (
+        <div style={{
+          position: "fixed", inset: 0, backgroundColor: C.overlay,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 70, padding: 16,
+        }} onClick={e => { if (e.target === e.currentTarget) setConfirmDelete(null); }}>
+          <div style={{
+            backgroundColor: C.bg, borderRadius: 20, padding: "32px 28px",
+            width: "100%", maxWidth: 340, textAlign: "center",
+          }}>
+            <p style={{ fontFamily: F.dancing, fontSize: 20, color: C.red, margin: "0 0 2px" }}>
+              just checking
+            </p>
+            <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "0 0 6px" }}>确认一下</p>
+            <h2 style={{ fontFamily: F.cormorant, fontSize: 26, fontWeight: 400, color: C.deep, margin: "0 0 10px" }}>
+              Remove this photo?
+            </h2>
+            <p style={{ fontSize: 13, color: C.muted, margin: "0 0 4px", lineHeight: 1.6 }}>
+              The photo will be hidden from the gallery.
+            </p>
+            <p style={{ fontFamily: ZH, fontSize: 12, color: C.muted, margin: "0 0 24px" }}>
+              该照片将从相册中隐藏。
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                style={{
+                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: C.deep, backgroundColor: "transparent",
+                  border: `1.5px solid ${C.line}`, padding: "11px 22px",
+                  cursor: "pointer", borderRadius: 20,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: "#fff", backgroundColor: C.btnBg,
+                  padding: "11px 22px", border: "none",
+                  cursor: "pointer", borderRadius: 20,
+                  opacity: deleting ? 0.65 : 1,
+                }}
+              >
+                {deleting ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -481,8 +667,30 @@ export default function MomentsPageReception() {
           min-height: 13px;
           opacity: 0.9;
         }
+        .card-delete-btn-r {
+          position: absolute;
+          top: 13px;
+          right: 13px;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: rgba(0,0,0,0.45);
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          opacity: 0;
+          transition: opacity 0.18s;
+        }
+        .photo-card-r:hover .card-delete-btn-r {
+          opacity: 1;
+        }
         @media (max-width: 540px) {
           .photo-grid-r { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+          .card-delete-btn-r { opacity: 0.75; }
         }
       `}</style>
     </div>

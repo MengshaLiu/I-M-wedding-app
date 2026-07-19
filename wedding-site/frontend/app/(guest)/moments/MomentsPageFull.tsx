@@ -37,6 +37,9 @@ export default function MomentsPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [lightbox, setLightbox] = useState<Photo | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Photo | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showUploadConfirm, setShowUploadConfirm] = useState(false);
 
   const [uploaderName, setUploaderName] = useState("");
   const [message, setMessage] = useState("");
@@ -85,6 +88,7 @@ export default function MomentsPage() {
     fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
     setFileEntries([]);
     setUploadError(""); setUploadProgress("");
+    setShowUploadConfirm(false);
     setShowModal(true);
   }
 
@@ -92,12 +96,28 @@ export default function MomentsPage() {
     fileEntries.forEach(e => URL.revokeObjectURL(e.preview));
     setFileEntries([]);
     setUploadError(""); setUploadProgress("");
+    setShowUploadConfirm(false);
     setShowModal(false);
   }
 
-  async function handleUpload(e: React.FormEvent) {
-    e.preventDefault();
-    if (!fileEntries.length || !uploaderName.trim()) return;
+  async function handleDelete() {
+    if (!confirmDelete || deleting) return;
+    setDeleting(true);
+    const id = confirmDelete.id;
+    try {
+      const res = await fetch(`/api/moments/${id}`, { method: "DELETE" });
+      if (res.ok || res.status === 204) {
+        setPhotos(prev => prev.filter(p => p.id !== id));
+        setTotal(t => t - 1);
+        if (lightbox?.id === id) setLightbox(null);
+      }
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(null);
+    }
+  }
+
+  async function doUpload() {
     setUploading(true);
     setUploadError("");
     const uploaded: Photo[] = [];
@@ -125,6 +145,12 @@ export default function MomentsPage() {
     setTotal(t => t + uploaded.length);
     setUploading(false);
     closeModal();
+  }
+
+  function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!fileEntries.length || !uploaderName.trim()) return;
+    setShowUploadConfirm(true);
   }
 
   const hasMore = photos.length < total;
@@ -177,6 +203,16 @@ export default function MomentsPage() {
                 className="photo-card"
                 onClick={() => setLightbox(p)}
               >
+                <button
+                  type="button"
+                  className="card-delete-btn"
+                  onClick={e => { e.stopPropagation(); setConfirmDelete(p); }}
+                  title="Remove photo"
+                >
+                  <svg width="11" height="12" viewBox="0 0 11 12" fill="currentColor">
+                    <path d="M3.5 0h4l.5.5H9.5v1h-8V.5H3L3.5 0zM1 2.5h9L9.3 10a1 1 0 0 1-1 .9H2.7a1 1 0 0 1-1-.9L1 2.5z"/>
+                  </svg>
+                </button>
                 <div className="card-img-wrap">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.thumb_url} alt={`Photo by ${p.uploader_name}`} className="card-img" />
@@ -227,112 +263,192 @@ export default function MomentsPage() {
               border: "none", cursor: "pointer", fontSize: 20, color: C.muted,
             }}>✕</button>
 
-            <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>share your photos</p>
-            <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 24px" }}>
-              Upload
-            </h2>
+            {!showUploadConfirm ? (
+              <>
+                <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>share your photos</p>
+                <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 24px" }}>
+                  Upload
+                </h2>
 
-            <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* File picker / previews */}
-              {fileEntries.length === 0 ? (
-                <div
-                  onClick={() => fileRef.current?.click()}
-                  style={{
-                    border: `1.5px dashed ${C.line}`, borderRadius: 12, padding: "28px 16px",
-                    textAlign: "center", cursor: "pointer", backgroundColor: "rgba(255,255,255,0.5)",
-                  }}
-                >
-                  <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
-                  <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
-                  <p style={{ fontSize: 11, color: C.muted, margin: "4px 0 0" }}>JPEG, PNG or WebP · max 10 MB each · up to {MAX_FILES} photos</p>
-                </div>
-              ) : (
-                <div>
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
-                    gap: 8,
-                  }}>
-                    {fileEntries.map((entry, i) => (
-                      <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={entry.preview} alt={`Photo ${i + 1}`} style={{
-                          width: "100%",
-                          height: fileEntries.length === 1 ? 200 : 90,
-                          objectFit: "cover", display: "block",
-                        }} />
-                        <button
-                          type="button" onClick={() => removeFile(i)}
-                          style={{
-                            position: "absolute", top: 4, right: 4,
-                            width: 22, height: 22, borderRadius: "50%",
-                            background: "rgba(0,0,0,0.55)", border: "none",
-                            color: "#fff", fontSize: 12, cursor: "pointer",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                          }}
-                        >✕</button>
-                      </div>
-                    ))}
-                  </div>
-                  {fileEntries.length < MAX_FILES && (
-                    <button
-                      type="button" onClick={() => fileRef.current?.click()}
+                <form onSubmit={handleUpload} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* File picker / previews */}
+                  {fileEntries.length === 0 ? (
+                    <div
+                      onClick={() => fileRef.current?.click()}
                       style={{
-                        marginTop: 8, width: "100%", padding: "8px",
-                        border: `1px dashed ${C.line}`, borderRadius: 8,
-                        background: "transparent", cursor: "pointer",
-                        fontSize: 12, color: C.sage, fontFamily: F.mulish,
+                        border: `1.5px dashed ${C.line}`, borderRadius: 12, padding: "28px 16px",
+                        textAlign: "center", cursor: "pointer", backgroundColor: "rgba(255,255,255,0.5)",
                       }}
                     >
-                      + Add more photos ({fileEntries.length}/{MAX_FILES})
-                    </button>
+                      <p style={{ fontSize: 28, margin: "0 0 4px" }}>📷</p>
+                      <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Tap to choose photos</p>
+                      <p style={{ fontSize: 11, color: C.muted, margin: "4px 0 0" }}>JPEG, PNG or WebP · max 20 MB each · up to {MAX_FILES} photos</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
+                        gap: 8,
+                      }}>
+                        {fileEntries.map((entry, i) => (
+                          <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={entry.preview} alt={`Photo ${i + 1}`} style={{
+                              width: "100%",
+                              height: fileEntries.length === 1 ? 200 : 90,
+                              objectFit: "cover", display: "block",
+                            }} />
+                            <button
+                              type="button" onClick={() => removeFile(i)}
+                              style={{
+                                position: "absolute", top: 4, right: 4,
+                                width: 22, height: 22, borderRadius: "50%",
+                                background: "rgba(0,0,0,0.55)", border: "none",
+                                color: "#fff", fontSize: 12, cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                              }}
+                            >✕</button>
+                          </div>
+                        ))}
+                      </div>
+                      {fileEntries.length < MAX_FILES && (
+                        <button
+                          type="button" onClick={() => fileRef.current?.click()}
+                          style={{
+                            marginTop: 8, width: "100%", padding: "8px",
+                            border: `1px dashed ${C.line}`, borderRadius: 8,
+                            background: "transparent", cursor: "pointer",
+                            fontSize: 12, color: C.sage, fontFamily: F.mulish,
+                          }}
+                        >
+                          + Add more photos ({fileEntries.length}/{MAX_FILES})
+                        </button>
+                      )}
+                    </div>
                   )}
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-                multiple style={{ display: "none" }} onChange={handleFileChange} />
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+                    multiple style={{ display: "none" }} onChange={handleFileChange} />
 
-              <input
-                type="text" required placeholder="Your name *"
-                value={uploaderName} onChange={e => setUploaderName(e.target.value)}
-                style={{
-                  border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
-                  fontSize: 14, fontFamily: F.mulish, color: C.deep,
-                  backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
-                }}
-              />
+                  <input
+                    type="text" required placeholder="Your name *"
+                    value={uploaderName} onChange={e => setUploaderName(e.target.value)}
+                    style={{
+                      border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
+                      fontSize: 14, fontFamily: F.mulish, color: C.deep,
+                      backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
+                    }}
+                  />
 
-              <textarea
-                placeholder="Add a wish or message (optional) — shared across all photos"
-                value={message} onChange={e => setMessage(e.target.value)}
-                rows={3}
-                style={{
-                  border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
-                  fontSize: 13, fontFamily: F.mulish, color: C.deep,
-                  backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
-                  resize: "none",
-                }}
-              />
+                  <textarea
+                    placeholder="Add a wish or message (optional) — shared across all photos"
+                    value={message} onChange={e => setMessage(e.target.value)}
+                    rows={3}
+                    style={{
+                      border: `1px solid ${C.line}`, borderRadius: 10, padding: "12px 14px",
+                      fontSize: 13, fontFamily: F.mulish, color: C.deep,
+                      backgroundColor: "rgba(255,255,255,0.7)", outline: "none",
+                      resize: "none",
+                    }}
+                  />
 
-              {uploadError && (
-                <p style={{ fontSize: 12, color: "oklch(45% .15 30)", margin: 0 }}>{uploadError}</p>
-              )}
+                  <button type="submit" disabled={!fileEntries.length || !uploaderName.trim()}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.25em", textTransform: "uppercase",
+                      color: C.btnText, backgroundColor: C.btnBg,
+                      padding: "14px 24px", border: "none", cursor: "pointer",
+                      borderRadius: 20, opacity: (!fileEntries.length || !uploaderName.trim()) ? 0.5 : 1,
+                    }}>
+                    {fileEntries.length > 1 ? `Share ${fileEntries.length} Photos` : "Share Photo"}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p style={{ fontFamily: F.dancing, fontSize: 22, color: C.sage, margin: "0 0 4px" }}>almost there</p>
+                <h2 style={{ fontFamily: F.cormorant, fontSize: 28, fontWeight: 400, color: C.deep, margin: "0 0 20px" }}>
+                  Share {fileEntries.length} Photo{fileEntries.length !== 1 ? "s" : ""}?
+                </h2>
 
-              <button type="submit" disabled={!fileEntries.length || !uploaderName.trim() || uploading}
-                style={{
-                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
-                  letterSpacing: "0.25em", textTransform: "uppercase",
-                  color: C.btnText, backgroundColor: C.btnBg,
-                  padding: "14px 24px", border: "none", cursor: "pointer",
-                  borderRadius: 20, opacity: (!fileEntries.length || !uploaderName.trim() || uploading) ? 0.5 : 1,
+                {/* Thumbnail preview */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: fileEntries.length === 1 ? "1fr" : "repeat(3, 1fr)",
+                  gap: 6, marginBottom: 16,
                 }}>
-                {uploading
-                  ? uploadProgress
-                  : fileEntries.length > 1
-                    ? `Share ${fileEntries.length} Photos`
-                    : "Share Photo"}
-              </button>
-            </form>
+                  {fileEntries.slice(0, 6).map((entry, i) => (
+                    <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={entry.preview} alt="" style={{
+                        width: "100%",
+                        height: fileEntries.length === 1 ? 160 : 72,
+                        objectFit: "cover", display: "block",
+                      }} />
+                      {i === 5 && fileEntries.length > 6 && (
+                        <div style={{
+                          position: "absolute", inset: 0,
+                          background: "rgba(0,0,0,0.55)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <span style={{ color: "#fff", fontSize: 16, fontFamily: F.mulish, fontWeight: 600 }}>
+                            +{fileEntries.length - 5}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{ fontFamily: F.dancing, fontSize: 18, color: C.deep, margin: "0 0 4px" }}>
+                  by {uploaderName}
+                </p>
+                {message.trim() ? (
+                  <p style={{ fontSize: 12, color: C.muted, margin: "0 0 20px", lineHeight: 1.6, fontStyle: "italic", fontFamily: F.mulish }}>
+                    &ldquo;{message.trim()}&rdquo;
+                  </p>
+                ) : (
+                  <div style={{ height: 20 }} />
+                )}
+
+                {uploadError && (
+                  <p style={{ fontSize: 12, color: "oklch(45% .15 30)", margin: "0 0 12px" }}>{uploadError}</p>
+                )}
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowUploadConfirm(false); setUploadError(""); }}
+                    disabled={uploading}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.2em", textTransform: "uppercase",
+                      color: C.deep, backgroundColor: "transparent",
+                      border: `1.5px solid ${C.line}`, padding: "13px 0",
+                      cursor: "pointer", borderRadius: 20, flex: 1,
+                      opacity: uploading ? 0.45 : 1,
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={doUpload}
+                    disabled={uploading}
+                    style={{
+                      fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                      letterSpacing: "0.25em", textTransform: "uppercase",
+                      color: C.btnText, backgroundColor: C.btnBg,
+                      padding: "13px 0", border: "none", cursor: "pointer",
+                      borderRadius: 20, flex: 2,
+                      opacity: uploading ? 0.7 : 1,
+                    }}
+                  >
+                    {uploading ? uploadProgress : "Confirm & Share"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -357,12 +473,77 @@ export default function MomentsPage() {
                 {lightbox.message}
               </p>
             )}
+            <button
+              onClick={e => { e.stopPropagation(); setConfirmDelete(lightbox); }}
+              style={{
+                marginTop: 16, background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.55)", padding: "7px 20px",
+                borderRadius: 20, cursor: "pointer", fontSize: 11,
+                fontFamily: F.mulish, letterSpacing: "0.15em",
+                textTransform: "uppercase",
+              }}
+            >
+              Remove photo
+            </button>
           </div>
           <button onClick={() => setLightbox(null)} style={{
             position: "fixed", top: 16, right: 16, background: "rgba(255,255,255,0.12)",
             border: "none", cursor: "pointer", fontSize: 18, color: "#fff",
             width: 36, height: 36, borderRadius: "50%",
           }}>✕</button>
+        </div>
+      )}
+
+      {/* ── Confirm delete ── */}
+      {confirmDelete && (
+        <div style={{
+          position: "fixed", inset: 0, backgroundColor: C.overlay,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 70, padding: 16,
+        }} onClick={e => { if (e.target === e.currentTarget) setConfirmDelete(null); }}>
+          <div style={{
+            backgroundColor: C.bg, borderRadius: 20, padding: "32px 28px",
+            width: "100%", maxWidth: 340, textAlign: "center",
+          }}>
+            <p style={{ fontFamily: F.dancing, fontSize: 20, color: C.sage, margin: "0 0 4px" }}>
+              just checking
+            </p>
+            <h2 style={{ fontFamily: F.cormorant, fontSize: 26, fontWeight: 400, color: C.deep, margin: "0 0 10px" }}>
+              Remove this photo?
+            </h2>
+            <p style={{ fontSize: 13, color: C.muted, margin: "0 0 24px", lineHeight: 1.6 }}>
+              The photo will be hidden from the gallery.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                style={{
+                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: C.deep, backgroundColor: "transparent",
+                  border: `1.5px solid ${C.line}`, padding: "11px 22px",
+                  cursor: "pointer", borderRadius: 20,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  fontFamily: F.mulish, fontSize: 11, fontWeight: 600,
+                  letterSpacing: "0.2em", textTransform: "uppercase",
+                  color: "#fff", backgroundColor: "oklch(40% .14 25)",
+                  padding: "11px 22px", border: "none",
+                  cursor: "pointer", borderRadius: 20,
+                  opacity: deleting ? 0.65 : 1,
+                }}
+              >
+                {deleting ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -450,8 +631,30 @@ export default function MomentsPage() {
           min-height: 13px;
           opacity: 0.9;
         }
+        .card-delete-btn {
+          position: absolute;
+          top: 13px;
+          right: 13px;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: rgba(0,0,0,0.45);
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          opacity: 0;
+          transition: opacity 0.18s;
+        }
+        .photo-card:hover .card-delete-btn {
+          opacity: 1;
+        }
         @media (max-width: 540px) {
           .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+          .card-delete-btn { opacity: 0.75; }
         }
       `}</style>
     </div>

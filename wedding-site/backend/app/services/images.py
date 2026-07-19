@@ -3,7 +3,7 @@ import io
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 ALLOWED_MIME = {"image/jpeg", "image/png", "image/webp"}
-MAX_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 DISPLAY_MAX = 1920
 THUMB_MAX = 800
 
@@ -12,7 +12,7 @@ def process(data: bytes) -> tuple[bytes, bytes]:
     """Validate image data and return (display_webp, thumb_webp).
     Raises ValueError on invalid input."""
     if len(data) > MAX_BYTES:
-        raise ValueError("File too large (max 10 MB)")
+        raise ValueError("File too large (max 20 MB)")
 
     try:
         img = Image.open(io.BytesIO(data))
