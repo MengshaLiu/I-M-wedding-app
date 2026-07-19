@@ -15,8 +15,8 @@ DRESS_CODE = "Garden Formal"
 TIMELINE = [
     {"id": "evt-1", "starts_at": None, "title": "Arrival & Registration at the Pavilion", "description": "Grab a welcome drink, find your seat, and soak in the tropical breeze", "visibility": "full_only"},
     {"id": "evt-2", "starts_at": "3:30 PM", "title": "Wedding Ceremony",             "description": "The moment we say 'I do'. Tissues recommended, happy tears only",             "visibility": "full_only"},
-    {"id": "evt-3", "starts_at": "5:00 PM", "title": "Cocktail Hour",                "description": "Mingle, clink glasses, and enjoy canapés while we sneak off for photos",             "visibility": "full_only"},
-    {"id": "evt-4", "starts_at": "6:30 PM",  "title": "Dinner at the Kota Kinabalu Room",     "description": "Indulge in a sumptuous Chinese feast, accompanied by live music and the joy of good company",     "visibility": "full_only"},
+    {"id": "evt-3", "starts_at": "5:00 PM", "title": "Refreshment at Sunset",                "description": "Mingle, clink glasses, and enjoy canapés while we sneak off for photos",             "visibility": "full_only"},
+    {"id": "evt-4", "starts_at": "6:30 PM",  "title": "Reception at the Kota Kinabalu Room",     "description": "Indulge in a sumptuous Chinese feast, accompanied by live music and the joy of good company",     "visibility": "full_only"},
 ]
 # ────────────────────────────────────────────────────────────────────────────
 

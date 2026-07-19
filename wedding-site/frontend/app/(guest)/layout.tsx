@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
+import MusicPlayer from "@/components/MusicPlayer";
 
 const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? "wss";
 const SESSION_SECRET = new TextEncoder().encode(process.env.SESSION_SECRET ?? "");
@@ -79,6 +80,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         </header>
         <main style={{ flex: 1 }}>{children}</main>
       </div>
+      <MusicPlayer src="/music/full.mp3" bgColor="oklch(36% .072 152)" accentColor="oklch(0.82 0.03 140)" />
       </>
     );
   }
@@ -134,6 +136,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         <style>{`.nav-link-reception:hover { color: ${RC.cream} !important; }`}</style>
       </header>
       <main style={{ flex: 1 }}>{children}</main>
+      <MusicPlayer src="/music/reception.mp3" bgColor="#b23a2b" accentColor="#faf2e0" />
     </div>
   );
 }
