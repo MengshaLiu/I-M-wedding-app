@@ -228,7 +228,7 @@ function FullGuestHome({ data }: { data: Record<string, unknown> }) {
           fontFamily: F.mulish, fontSize: 14, color: C.muted,
           maxWidth: 380, lineHeight: 1.7, margin: 0,
         }}>
-          Soft, elegant and earthy. Forest greens, light and warm neutrals are warmly encouraged.
+          We would love to see our beautiful wedding filled with light colors. We kindly ask that guests avoid black and white attire.
         </p>
       </div>
 
