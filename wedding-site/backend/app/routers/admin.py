@@ -44,14 +44,21 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 @router.post("/login", response_model=AdminLoginResponse)
 async def admin_login(body: AdminLoginRequest):
-    username_ok = hmac.compare_digest(body.username, settings.admin_username)
-    password_ok = hmac.compare_digest(body.password, settings.admin_password)
-    if not (username_ok and password_ok):
+    owner_ok = hmac.compare_digest(body.username, settings.admin_username) and \
+               hmac.compare_digest(body.password, settings.admin_password)
+
+    planner_ok = bool(settings.planner_username) and \
+                 hmac.compare_digest(body.username, settings.planner_username) and \
+                 hmac.compare_digest(body.password, settings.planner_password)
+
+    if not (owner_ok or planner_ok):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    role = "owner" if owner_ok else "planner"
     now = datetime.now(tz=timezone.utc)
     payload = {
         "admin": True,
+        "role": role,
         "sub": body.username,
         "iat": now,
         "exp": now + timedelta(hours=settings.admin_jwt_expire_hours),

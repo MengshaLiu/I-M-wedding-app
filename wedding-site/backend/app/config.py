@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=[".env", "../.env"], extra="ignore")
 
     database_url: str
     invite_token_full: str
@@ -21,11 +21,15 @@ class Settings(BaseSettings):
     # virtual-hosted S3 URL: https://{bucket}.s3.{region}.amazonaws.com
     s3_public_url_base: str = ""
 
-    # Admin
+    # Admin (owner)
     admin_username: str = "admin"
     admin_password: str = "I&Mwedding2026!"  # override in production
     admin_cookie_name: str = "wsa"
     admin_jwt_expire_hours: int = 24
+
+    # Planner account (limited access — QR codes + tables only)
+    planner_username: str = ""
+    planner_password: str = ""
 
     # Used in QR code URLs
     site_url: str = "https://i-m-wedding-app-production.up.railway.app"

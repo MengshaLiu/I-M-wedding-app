@@ -1016,7 +1016,20 @@ type Tab = "links" | "seating" | "photos";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("links");
+  const [role, setRole] = useState<string>("owner");
   const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then(r => r.json())
+      .then(d => {
+        const r = d.role ?? "owner";
+        setRole(r);
+        if (r === "planner" && activeTab === "photos") setActiveTab("links");
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -1024,10 +1037,11 @@ export default function AdminDashboard() {
     router.refresh();
   }
 
+  const isOwner = role !== "planner";
   const tabs: Array<{ key: Tab; label: string }> = [
     { key: "links", label: "Invite Links" },
     { key: "seating", label: "Guests & Tables" },
-    { key: "photos", label: "Photos" },
+    ...(isOwner ? [{ key: "photos" as Tab, label: "Photos" }] : []),
   ];
 
   return (
