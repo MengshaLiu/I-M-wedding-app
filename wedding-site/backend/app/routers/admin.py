@@ -114,6 +114,8 @@ def _guest_out(g: GuestList) -> GuestOut:
         tier=g.tier,
         table_id=str(g.table_id) if g.table_id else None,
         table_label=g.table.label if g.table else None,
+        dietary=g.dietary,
+        special_requirements=g.special_requirements,
     )
 
 
@@ -156,6 +158,8 @@ async def create_guest(
         pax=body.pax,
         tier=body.tier,
         table_id=table_id,
+        dietary=body.dietary or None,
+        special_requirements=body.special_requirements or None,
     )
     db.add(guest)
     await db.commit()
@@ -195,6 +199,8 @@ async def update_guest(
         if body.tier not in ("full", "reception"):
             raise HTTPException(400, "tier must be 'full' or 'reception'")
         guest.tier = body.tier
+    guest.dietary = body.dietary or None
+    guest.special_requirements = body.special_requirements or None
     if body.clear_table:
         guest.table_id = None
     elif body.table_id is not None:

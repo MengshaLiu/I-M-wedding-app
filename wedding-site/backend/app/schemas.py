@@ -77,6 +77,8 @@ class GuestOut(BaseModel):
     tier: str
     table_id: str | None
     table_label: str | None
+    dietary: str | None = None
+    special_requirements: str | None = None
 
 
 class GuestCreate(BaseModel):
@@ -84,6 +86,8 @@ class GuestCreate(BaseModel):
     pax: int | None = None
     tier: str
     table_id: str | None = None
+    dietary: str | None = None
+    special_requirements: str | None = None
 
 
 class GuestUpdate(BaseModel):
@@ -92,6 +96,8 @@ class GuestUpdate(BaseModel):
     tier: str | None = None
     table_id: str | None = None
     clear_table: bool = False  # set True to explicitly unassign table
+    dietary: str | None = None
+    special_requirements: str | None = None
 
 
 class TableOut(BaseModel):

@@ -12,6 +12,8 @@ interface Guest {
   tier: "full" | "reception";
   table_id: string | null;
   table_label: string | null;
+  dietary: string | null;
+  special_requirements: string | null;
 }
 
 interface Table {
@@ -454,7 +456,7 @@ function SeatingTab() {
   const [showImport, setShowImport] = useState(false);
 
   // Guest form state
-  const [guestForm, setGuestForm] = useState({ name: "", pax: "", tier: "full", table_id: "" });
+  const [guestForm, setGuestForm] = useState({ name: "", pax: "", tier: "full", table_id: "", dietary: "", special_requirements: "" });
   const [guestAddMode, setGuestAddMode] = useState(false);
   const [editingGuestId, setEditingGuestId] = useState<string | null>(null);
   const [guestSaving, setGuestSaving] = useState(false);
@@ -479,13 +481,13 @@ function SeatingTab() {
 
   // ── Guest handlers ──
   function startAddGuest() {
-    setGuestForm({ name: "", pax: "", tier: "full", table_id: "" });
+    setGuestForm({ name: "", pax: "", tier: "full", table_id: "", dietary: "", special_requirements: "" });
     setGuestAddMode(true); setEditingGuestId(null); setGuestError("");
     setTableAddMode(false); setEditingTableId(null);
   }
 
   function startEditGuest(g: Guest) {
-    setGuestForm({ name: g.name, pax: g.pax != null ? String(g.pax) : "", tier: g.tier, table_id: g.table_id ?? "" });
+    setGuestForm({ name: g.name, pax: g.pax != null ? String(g.pax) : "", tier: g.tier, table_id: g.table_id ?? "", dietary: g.dietary ?? "", special_requirements: g.special_requirements ?? "" });
     setEditingGuestId(g.id); setGuestAddMode(false); setGuestError("");
     setTableAddMode(false); setEditingTableId(null);
   }
@@ -495,7 +497,7 @@ function SeatingTab() {
   async function saveGuest(e: React.FormEvent) {
     e.preventDefault();
     setGuestSaving(true); setGuestError("");
-    const body = { name: guestForm.name.trim(), pax: guestForm.pax !== "" ? parseInt(guestForm.pax) : null, tier: guestForm.tier, table_id: guestForm.table_id || null };
+    const body = { name: guestForm.name.trim(), pax: guestForm.pax !== "" ? parseInt(guestForm.pax) : null, tier: guestForm.tier, table_id: guestForm.table_id || null, dietary: guestForm.dietary.trim() || null, special_requirements: guestForm.special_requirements.trim() || null };
     try {
       const res = guestAddMode
         ? await apiFetch("/api/admin/guests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
@@ -579,7 +581,15 @@ function SeatingTab() {
       borderBottom: !last ? `1px solid ${C.line}` : "none",
       backgroundColor: i % 2 === 0 ? "#fff" : "#fafaf8",
     }}>
-      <span style={{ flex: 1, color: C.deep, fontSize: 13, fontWeight: 500 }}>{g.name}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ color: C.deep, fontSize: 13, fontWeight: 500 }}>{g.name}</span>
+        {(g.dietary || g.special_requirements) && (
+          <div style={{ fontSize: 11, color: C.sage, marginTop: 2, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {g.dietary && <span>🥗 {g.dietary}</span>}
+            {g.special_requirements && <span>⭐ {g.special_requirements}</span>}
+          </div>
+        )}
+      </div>
       {g.pax != null && <span style={{ fontSize: 11, color: C.sage, whiteSpace: "nowrap" }}>{g.pax} pax</span>}
       {tierBadge(g.tier)}
       <div style={{ display: "flex", gap: 6 }}>
@@ -660,6 +670,14 @@ function SeatingTab() {
                 {tables.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
               </select>
             </div>
+            <div style={{ gridColumn: "span 2" }}>
+              <label style={labelStyle}>Dietary Requirements</label>
+              <input style={inputStyle} placeholder="e.g. Vegetarian, Nut allergy" value={guestForm.dietary} onChange={e => setGuestForm(f => ({ ...f, dietary: e.target.value }))} />
+            </div>
+            <div style={{ gridColumn: "span 2" }}>
+              <label style={labelStyle}>Special Requirements</label>
+              <input style={inputStyle} placeholder="e.g. Wheelchair access, baby high chair" value={guestForm.special_requirements} onChange={e => setGuestForm(f => ({ ...f, special_requirements: e.target.value }))} />
+            </div>
           </div>
           {guestError && <p style={{ color: C.danger, fontSize: 12, margin: "0 0 10px" }}>{guestError}</p>}
           <div style={{ display: "flex", gap: 8 }}>
@@ -708,7 +726,7 @@ function SeatingTab() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${C.line}` }}>
-                  {["Name", "Pax", "Tier", "Table", ""].map(h => (
+                  {["Name", "Pax", "Tier", "Table", "Dietary", "Special Req.", ""].map(h => (
                     <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.sage }}>{h}</th>
                   ))}
                 </tr>
@@ -720,6 +738,8 @@ function SeatingTab() {
                     <td style={{ padding: "10px 12px", color: C.sage }}>{g.pax ?? "—"}</td>
                     <td style={{ padding: "10px 12px" }}>{tierBadge(g.tier)}</td>
                     <td style={{ padding: "10px 12px", color: C.sage }}>{g.table_label ?? "—"}</td>
+                    <td style={{ padding: "10px 12px", color: C.sage, fontSize: 12 }}>{g.dietary ?? "—"}</td>
+                    <td style={{ padding: "10px 12px", color: C.sage, fontSize: 12 }}>{g.special_requirements ?? "—"}</td>
                     <td style={{ padding: "10px 12px" }}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => startEditGuest(g)} style={btnStyle("ghost")}>Edit</button>

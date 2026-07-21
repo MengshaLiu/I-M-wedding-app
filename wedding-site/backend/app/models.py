@@ -29,6 +29,8 @@ class GuestList(Base):
     pax: Mapped[int] = mapped_column(Integer, nullable=True)
     tier: Mapped[str] = mapped_column(TierEnum, nullable=False)
     table_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("tables.id"))
+    dietary: Mapped[str | None] = mapped_column(Text)
+    special_requirements: Mapped[str | None] = mapped_column(Text)
 
     table: Mapped["Table | None"] = relationship("Table", back_populates="guests")
 
