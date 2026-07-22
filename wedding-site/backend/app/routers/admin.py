@@ -84,14 +84,30 @@ async def get_invite_links(_admin: dict = Depends(require_admin)):
 
 
 @router.get("/invite-links/qr")
-async def invite_link_qr(tier: str = "full", _admin: dict = Depends(require_admin)):
+async def invite_link_qr(
+    tier: str = "full",
+    fill: str = "#000000",
+    bg: str = "#ffffff",
+    _admin: dict = Depends(require_admin),
+):
     if tier not in ("full", "reception"):
         raise HTTPException(400, "tier must be 'full' or 'reception'")
 
     token = settings.invite_token_full if tier == "full" else settings.invite_token_reception
     url = f"{settings.site_url}/i/{token}"
 
-    img = qrcode.make(url)
+    def hex_to_rgba(h: str, alpha: int = 255) -> tuple:
+        h = h.lstrip("#")
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4)) + (alpha,)
+
+    transparent_bg = bg.lower() == "transparent"
+    fill_color = hex_to_rgba(fill) if transparent_bg else fill
+    back_color = (255, 255, 255, 0) if transparent_bg else bg
+
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color=fill_color, back_color=back_color)
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)
