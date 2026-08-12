@@ -88,7 +88,7 @@ async def get_invite_links(_admin: dict = Depends(require_admin)):
 async def invite_link_qr(
     tier: str = "full",
     fill: str = "#000000",
-    bg: str = "#ffffff",
+    bg: str = "transparent",
     _admin: dict = Depends(require_admin),
 ):
     if tier not in ("full", "reception"):
