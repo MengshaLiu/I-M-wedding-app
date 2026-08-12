@@ -8,7 +8,7 @@ import zipfile
 from datetime import datetime, timedelta, timezone
 
 import qrcode
-from PIL import Image as PILImage
+from PIL import Image as PILImage, ImageDraw
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response, StreamingResponse
 from jose import jwt
@@ -99,24 +99,30 @@ async def invite_link_qr(
 
     transparent_bg = bg.lower() == "transparent"
 
-    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H, border=4)
     qr.add_data(url)
     qr.make(fit=True)
 
     buf = io.BytesIO()
     if transparent_bg:
-        # qrcode's PIL factory always creates RGB images, ignoring any alpha in
-        # back_color. Save to a temp buffer, reopen with PIL, convert to RGBA,
-        # then zero out white (background) pixels.
-        tmp = io.BytesIO()
-        qr.make_image(fill_color=fill, back_color="white").save(tmp, format="PNG")
-        tmp.seek(0)
-        rgba = PILImage.open(tmp).convert("RGBA")
-        rgba.putdata([
-            (r, g, b, 0) if (r > 240 and g > 240 and b > 240) else (r, g, b, a)
-            for r, g, b, a in rgba.getdata()
-        ])
-        rgba.save(buf, format="PNG")
+        # Draw directly onto an RGBA canvas so the background is never painted,
+        # avoiding any reliance on post-hoc white-pixel detection.
+        fill_hex = fill.lstrip("#")
+        fill_rgb = tuple(int(fill_hex[i:i+2], 16) for i in (0, 2, 4))
+        box = 10
+        matrix = qr.get_matrix()
+        n = len(matrix)
+        size = (n + 2 * qr.border) * box
+        img = PILImage.new("RGBA", (size, size), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        for y, row in enumerate(matrix):
+            for x, val in enumerate(row):
+                if val:
+                    x0 = (x + qr.border) * box
+                    y0 = (y + qr.border) * box
+                    draw.rectangle([x0, y0, x0 + box - 1, y0 + box - 1],
+                                   fill=fill_rgb + (255,))
+        img.save(buf, format="PNG")
     else:
         qr.make_image(fill_color=fill, back_color=bg).save(buf, format="PNG")
     buf.seek(0)
