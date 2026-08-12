@@ -90,9 +90,9 @@ function InviteLinksTab() {
   const [links, setLinks] = useState<InviteLinks | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [qrColors, setQrColors] = useState<Record<string, { fill: string; bg: string; transparentBg: boolean }>>({
-    full:      { fill: "#2d5a3d", bg: "#ffffff", transparentBg: true },
-    reception: { fill: "#b23a2b", bg: "#ffffff", transparentBg: true },
+  const [qrColors, setQrColors] = useState<Record<string, string>>({
+    full:      "#2d5a3d",
+    reception: "#b23a2b",
   });
 
   useEffect(() => {
@@ -109,8 +109,8 @@ function InviteLinksTab() {
   }
 
   function downloadQR(tier: "full" | "reception") {
-    const { fill, bg, transparentBg } = qrColors[tier];
-    const params = new URLSearchParams({ tier, fill, bg: transparentBg ? "transparent" : bg });
+    const fill = qrColors[tier];
+    const params = new URLSearchParams({ tier, fill, bg: "transparent" });
     const a = document.createElement("a");
     a.href = `/api/admin/invite-links/qr?${params}`;
     a.download = `invite-qr-${tier}.png`;
@@ -155,35 +155,17 @@ function InviteLinksTab() {
             </button>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: C.sage }}>
               QR color
               <input
                 type="color"
-                value={qrColors[key].fill}
-                onChange={e => setQrColors(c => ({ ...c, [key]: { ...c[key], fill: e.target.value } }))}
+                value={qrColors[key]}
+                onChange={e => setQrColors(c => ({ ...c, [key]: e.target.value }))}
                 style={{ width: 32, height: 28, padding: 2, border: `1px solid ${C.line}`, borderRadius: 4, cursor: "pointer" }}
               />
             </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: C.sage, cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={qrColors[key].transparentBg}
-                onChange={e => setQrColors(c => ({ ...c, [key]: { ...c[key], transparentBg: e.target.checked } }))}
-              />
-              Transparent background
-            </label>
-            {!qrColors[key].transparentBg && (
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: C.sage }}>
-                Background
-                <input
-                  type="color"
-                  value={qrColors[key].bg}
-                  onChange={e => setQrColors(c => ({ ...c, [key]: { ...c[key], bg: e.target.value } }))}
-                  style={{ width: 32, height: 28, padding: 2, border: `1px solid ${C.line}`, borderRadius: 4, cursor: "pointer" }}
-                />
-              </label>
-            )}
+            <span style={{ fontSize: 11, color: C.sage }}>(transparent background)</span>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={() => downloadQR(key)} style={btnStyle("primary")}>
