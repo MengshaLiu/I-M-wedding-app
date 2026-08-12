@@ -8,6 +8,7 @@ import zipfile
 from datetime import datetime, timedelta, timezone
 
 import qrcode
+from PIL import Image as PILImage
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response, StreamingResponse
 from jose import jwt
@@ -104,19 +105,20 @@ async def invite_link_qr(
 
     buf = io.BytesIO()
     if transparent_bg:
-        # qrcode's PIL factory always creates RGB images, so alpha in back_color
-        # is ignored. Generate on white, convert to RGBA, then zero out white pixels.
-        img = qr.make_image(fill_color=fill, back_color="white")
-        rgba = img._img.convert("RGBA")
-        data = rgba.getdata()
+        # qrcode's PIL factory always creates RGB images, ignoring any alpha in
+        # back_color. Save to a temp buffer, reopen with PIL, convert to RGBA,
+        # then zero out white (background) pixels.
+        tmp = io.BytesIO()
+        qr.make_image(fill_color=fill, back_color="white").save(tmp, format="PNG")
+        tmp.seek(0)
+        rgba = PILImage.open(tmp).convert("RGBA")
         rgba.putdata([
             (r, g, b, 0) if (r > 240 and g > 240 and b > 240) else (r, g, b, a)
-            for r, g, b, a in data
+            for r, g, b, a in rgba.getdata()
         ])
         rgba.save(buf, format="PNG")
     else:
-        img = qr.make_image(fill_color=fill, back_color=bg)
-        img.save(buf, format="PNG")
+        qr.make_image(fill_color=fill, back_color=bg).save(buf, format="PNG")
     buf.seek(0)
 
     filename = f"invite-qr-{tier}.png"
