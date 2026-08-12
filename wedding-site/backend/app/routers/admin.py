@@ -105,23 +105,24 @@ async def invite_link_qr(
 
     buf = io.BytesIO()
     if transparent_bg:
-        # Draw directly onto an RGBA canvas so the background is never painted,
-        # avoiding any reliance on post-hoc white-pixel detection.
+        # qr.modules is the raw data matrix (no border), True = dark module.
+        # qr.get_matrix() includes the border already, so using it with an extra
+        # border offset causes double-counting and wrong coordinates.
         fill_hex = fill.lstrip("#")
-        fill_rgb = tuple(int(fill_hex[i:i+2], 16) for i in (0, 2, 4))
+        fill_rgba = tuple(int(fill_hex[i:i+2], 16) for i in (0, 2, 4)) + (255,)
         box = 10
-        matrix = qr.get_matrix()
-        n = len(matrix)
-        size = (n + 2 * qr.border) * box
+        border = qr.border
+        modules = qr.modules  # 2-D list of bool, no quiet zone
+        n = len(modules)
+        size = (n + 2 * border) * box
         img = PILImage.new("RGBA", (size, size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
-        for y, row in enumerate(matrix):
+        for y, row in enumerate(modules):
             for x, val in enumerate(row):
                 if val:
-                    x0 = (x + qr.border) * box
-                    y0 = (y + qr.border) * box
-                    draw.rectangle([x0, y0, x0 + box - 1, y0 + box - 1],
-                                   fill=fill_rgb + (255,))
+                    x0 = (x + border) * box
+                    y0 = (y + border) * box
+                    draw.rectangle([x0, y0, x0 + box - 1, y0 + box - 1], fill=fill_rgba)
         img.save(buf, format="PNG")
     else:
         qr.make_image(fill_color=fill, back_color=bg).save(buf, format="PNG")
