@@ -96,20 +96,27 @@ async def invite_link_qr(
     token = settings.invite_token_full if tier == "full" else settings.invite_token_reception
     url = f"{settings.site_url}/i/{token}"
 
-    def hex_to_rgba(h: str, alpha: int = 255) -> tuple:
-        h = h.lstrip("#")
-        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4)) + (alpha,)
-
     transparent_bg = bg.lower() == "transparent"
-    fill_color = hex_to_rgba(fill) if transparent_bg else fill
-    back_color = (255, 255, 255, 0) if transparent_bg else bg
 
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
     qr.add_data(url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color=fill_color, back_color=back_color)
+
     buf = io.BytesIO()
-    img.save(buf, format="PNG")
+    if transparent_bg:
+        # qrcode's PIL factory always creates RGB images, so alpha in back_color
+        # is ignored. Generate on white, convert to RGBA, then zero out white pixels.
+        img = qr.make_image(fill_color=fill, back_color="white")
+        rgba = img._img.convert("RGBA")
+        data = rgba.getdata()
+        rgba.putdata([
+            (r, g, b, 0) if (r > 240 and g > 240 and b > 240) else (r, g, b, a)
+            for r, g, b, a in data
+        ])
+        rgba.save(buf, format="PNG")
+    else:
+        img = qr.make_image(fill_color=fill, back_color=bg)
+        img.save(buf, format="PNG")
     buf.seek(0)
 
     filename = f"invite-qr-{tier}.png"

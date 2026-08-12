@@ -508,9 +508,12 @@ function SeatingTab() {
   const loadAll = useCallback(() => {
     setLoading(true);
     Promise.all([
-      apiFetch("/api/admin/guests").then(r => r.json()),
-      apiFetch("/api/admin/tables").then(r => r.json()),
-    ]).then(([g, t]) => { setGuests(g); setTables(t); }).finally(() => setLoading(false));
+      apiFetch("/api/admin/guests").then(r => r.ok ? r.json() : []),
+      apiFetch("/api/admin/tables").then(r => r.ok ? r.json() : []),
+    ]).then(([g, t]) => {
+      setGuests(Array.isArray(g) ? g : []);
+      setTables(Array.isArray(t) ? t : []);
+    }).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => { loadAll(); }, [loadAll]);
