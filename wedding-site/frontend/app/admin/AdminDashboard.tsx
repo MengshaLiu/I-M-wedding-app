@@ -93,6 +93,8 @@ function InviteLinksTab() {
   const [qrColors, setQrColors] = useState<Record<string, string>>({
     full:      "#2d5a3d",
     reception: "#b23a2b",
+    seats:     "#b23a2b",
+    moments:   "#b23a2b",
   });
 
   useEffect(() => {
@@ -114,6 +116,15 @@ function InviteLinksTab() {
     const a = document.createElement("a");
     a.href = `/api/admin/invite-links/qr?${params}`;
     a.download = `invite-qr-${tier}.png`;
+    a.click();
+  }
+
+  function downloadPageQR(page: "seats" | "moments") {
+    const fill = qrColors[page];
+    const params = new URLSearchParams({ page, fill, bg: "transparent" });
+    const a = document.createElement("a");
+    a.href = `/api/admin/page-qr?${params}`;
+    a.download = `qr-${page}.png`;
     a.click();
   }
 
@@ -180,6 +191,48 @@ function InviteLinksTab() {
           </div>
         </div>
       ))}
+
+      {/* ── Reception page QR codes ── */}
+      <div style={{
+        backgroundColor: C.card, borderRadius: 12,
+        padding: "24px 28px", border: `1px solid ${C.line}`,
+      }}>
+        <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 600, color: "#b23a2b" }}>
+          Reception Page QR Codes
+        </h3>
+        <p style={{ margin: "0 0 20px", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: C.sage }}>
+          Direct links for reception guests
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {([
+            { page: "seats" as const, label: "Seating Chart", path: "/seats" },
+            { page: "moments" as const, label: "Photo Gallery", path: "/moments" },
+          ]).map(({ page, label, path }) => (
+            <div key={page} style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "14px 16px", backgroundColor: C.bg,
+              borderRadius: 8, border: `1px solid ${C.line}`,
+            }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 600, color: C.deep }}>{label}</p>
+                <code style={{ fontSize: 12, color: C.sage }}>{path}</code>
+              </div>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: C.sage }}>
+                QR color
+                <input
+                  type="color"
+                  value={qrColors[page]}
+                  onChange={e => setQrColors(c => ({ ...c, [page]: e.target.value }))}
+                  style={{ width: 32, height: 28, padding: 2, border: `1px solid ${C.line}`, borderRadius: 4, cursor: "pointer" }}
+                />
+              </label>
+              <button onClick={() => downloadPageQR(page)} style={btnStyle("primary")}>
+                Download QR
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div style={{
         backgroundColor: "#fffef0", borderRadius: 8, padding: "14px 18px",

@@ -84,25 +84,11 @@ async def get_invite_links(_admin: dict = Depends(require_admin)):
     )
 
 
-@router.get("/invite-links/qr")
-async def invite_link_qr(
-    tier: str = "full",
-    fill: str = "#000000",
-    bg: str = "transparent",
-    _admin: dict = Depends(require_admin),
-):
-    if tier not in ("full", "reception"):
-        raise HTTPException(400, "tier must be 'full' or 'reception'")
-
-    token = settings.invite_token_full if tier == "full" else settings.invite_token_reception
-    url = f"{settings.site_url}/i/{token}"
-
+def _make_qr_png(url: str, fill: str, bg: str) -> bytes:
     transparent_bg = bg.lower() == "transparent"
-
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H, border=4)
     qr.add_data(url)
     qr.make(fit=True)
-
     buf = io.BytesIO()
     if transparent_bg:
         # qr.modules is the raw data matrix (no border), True = dark module.
@@ -112,7 +98,7 @@ async def invite_link_qr(
         fill_rgba = tuple(int(fill_hex[i:i+2], 16) for i in (0, 2, 4)) + (255,)
         box = 10
         border = qr.border
-        modules = qr.modules  # 2-D list of bool, no quiet zone
+        modules = qr.modules
         n = len(modules)
         size = (n + 2 * border) * box
         img = PILImage.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -127,10 +113,44 @@ async def invite_link_qr(
     else:
         qr.make_image(fill_color=fill, back_color=bg).save(buf, format="PNG")
     buf.seek(0)
+    return buf.read()
 
+
+@router.get("/invite-links/qr")
+async def invite_link_qr(
+    tier: str = "full",
+    fill: str = "#000000",
+    bg: str = "transparent",
+    _admin: dict = Depends(require_admin),
+):
+    if tier not in ("full", "reception"):
+        raise HTTPException(400, "tier must be 'full' or 'reception'")
+    token = settings.invite_token_full if tier == "full" else settings.invite_token_reception
+    url = f"{settings.site_url}/i/{token}"
+    png = _make_qr_png(url, fill, bg)
     filename = f"invite-qr-{tier}.png"
     return Response(
-        content=buf.read(),
+        content=png,
+        media_type="image/png",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/page-qr")
+async def page_qr(
+    page: str = Query(...),
+    fill: str = "#000000",
+    bg: str = "transparent",
+    _admin: dict = Depends(require_admin),
+):
+    allowed = {"seats", "moments"}
+    if page not in allowed:
+        raise HTTPException(400, f"page must be one of: {', '.join(sorted(allowed))}")
+    url = f"{settings.site_url}/{page}"
+    png = _make_qr_png(url, fill, bg)
+    filename = f"qr-{page}.png"
+    return Response(
+        content=png,
         media_type="image/png",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
