@@ -146,7 +146,10 @@ async def page_qr(
     allowed = {"seats", "moments"}
     if page not in allowed:
         raise HTTPException(400, f"page must be one of: {', '.join(sorted(allowed))}")
-    url = f"{settings.site_url}/{page}"
+    # QR lands on the invite handler so the guest is authenticated first,
+    # then redirected straight to the target page.
+    token = settings.invite_token_reception
+    url = f"{settings.site_url}/i/{token}?redirect=/{page}"
     png = _make_qr_png(url, fill, bg)
     filename = f"qr-{page}.png"
     return Response(

@@ -32,7 +32,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ toke
     return NextResponse.redirect(new URL("/invalid", origin));
   }
 
-  const response = NextResponse.redirect(new URL("/", origin));
+  const rawRedirect = req.nextUrl.searchParams.get("redirect") ?? "/";
+  // Only allow relative paths to prevent open-redirect abuse
+  const safePath = rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/";
+  const response = NextResponse.redirect(new URL(safePath, origin));
   response.cookies.set(SESSION_COOKIE, jwt, {
     httpOnly: true,
     sameSite: "lax",
