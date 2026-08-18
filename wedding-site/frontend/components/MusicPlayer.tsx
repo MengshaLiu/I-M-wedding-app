@@ -5,10 +5,12 @@ export default function MusicPlayer({
   src,
   bgColor,
   accentColor,
+  autoPlay = true,
 }: {
   src: string;
   bgColor: string;
   accentColor: string;
+  autoPlay?: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -18,6 +20,8 @@ export default function MusicPlayer({
     audio.loop = true;
     audio.volume = 0.4;
     audioRef.current = audio;
+
+    if (!autoPlay) return () => { audio.pause(); };
 
     // Try immediate autoplay; if blocked, start on first interaction.
     audio.play().then(() => {
@@ -43,7 +47,7 @@ export default function MusicPlayer({
     });
 
     return () => { audio.pause(); };
-  }, [src]);
+  }, [src, autoPlay]);
 
   function toggle() {
     const audio = audioRef.current;

@@ -136,7 +136,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         <style>{`.nav-link-reception:hover { color: ${RC.cream} !important; } @media (max-width: 480px) { .nav-logo { height: 72px !important; } }`}</style>
       </header>
       <main style={{ flex: 1 }}>{children}</main>
-      <MusicPlayer src="/music/reception.mp3" bgColor="#b23a2b" accentColor="#faf2e0" />
+      <MusicPlayer src="/music/reception.mp3" bgColor="#b23a2b" accentColor="#faf2e0" autoPlay={false} />
     </div>
   );
 }
