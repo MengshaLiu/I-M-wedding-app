@@ -60,7 +60,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
           }}>
             <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/wedding/logo.png" alt="I & M" style={{ height: 150, width: 150, mixBlendMode: "screen"}} />
+              <img src="/wedding/logo.png" alt="I & M" className="nav-logo" style={{ height: 150, width: "auto", mixBlendMode: "screen" }} />
             </Link>
             <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
               {links.map(({ label, href }) => (
@@ -76,7 +76,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
               ))}
             </div>
           </nav>
-          <style>{`.nav-link-full:hover { color: ${C.sage} !important; }`}</style>
+          <style>{`.nav-link-full:hover { color: ${C.sage} !important; } @media (max-width: 480px) { .nav-logo { height: 72px !important; } }`}</style>
         </header>
         <main style={{ flex: 1 }}>{children}</main>
       </div>
@@ -107,7 +107,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         }}>
           <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wedding/chinese-logo.png" alt="I & M" style={{ height: 180, width: 180, mixBlendMode: "screen"}} />
+            <img src="/wedding/chinese-logo.png" alt="I & M" className="nav-logo" style={{ height: 180, width: "auto", mixBlendMode: "screen" }} />
           </Link>
           <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
             {receptionLinks.map(({ label, chinese, href }) => (
@@ -133,7 +133,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
             ))}
           </div>
         </nav>
-        <style>{`.nav-link-reception:hover { color: ${RC.cream} !important; }`}</style>
+        <style>{`.nav-link-reception:hover { color: ${RC.cream} !important; } @media (max-width: 480px) { .nav-logo { height: 72px !important; } }`}</style>
       </header>
       <main style={{ flex: 1 }}>{children}</main>
       <MusicPlayer src="/music/reception.mp3" bgColor="#b23a2b" accentColor="#faf2e0" />
