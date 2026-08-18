@@ -699,10 +699,14 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           maxWidth: 560, lineHeight: 1.85, margin: "0 0 16px",
         }}>
           <p>Today, our two families become one,</p>
-          <p>and we get to share it with the people who mean the most to us.</p>
-          <p>Thank you for travelling near and far to stand by our side.</p>
+          <p>and we get to share it with the people</p> 
+          <p>who mean the most to us.</p>
+          <p>Thank you for travelling near and far</p> 
+          <p>to stand by our side.</p>
           <p>Here&apos;s to red envelopes, good tea, great food, and a night full of laughter. </p>  
           <p>We&apos;re so glad you&apos;re here.</p>
+          <p></p>
+          <p>September 12, 2026</p>
         </div>
         <div style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
@@ -711,11 +715,12 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
         }}>
           <p>今天，两个家庭合二为一</p>
           <p>我们有幸与最重要的人共同分享这一刻</p>
-          <p>感谢您跋山涉水 前来见证我们的幸福</p>
-          <p>愿</p>
-          <p>红包满载 好茶飘香</p>
+          <p>感谢您跋山涉水 前来见证我们的幸福</p> 
+          <p>愿红包满载 好茶飘香</p>
           <p>美食不断 笑声不绝</p>
           <p>很高兴今天有您共见欢喜</p>
+          <p></p>
+          <p>二O二六年九月12日</p>
           </div>
       </div>
 
