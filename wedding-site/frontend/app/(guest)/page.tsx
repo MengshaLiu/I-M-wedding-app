@@ -705,8 +705,6 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           <p>to stand by our side.</p>
           <p>Here&apos;s to red envelopes, good tea, great food, and a night full of laughter. </p>  
           <p>We&apos;re so glad you&apos;re here.</p>
-          <p></p>
-          <p>September 12, 2026</p>
         </div>
         <div style={{
           fontFamily: "'PingFang SC', 'Microsoft YaHei', serif",
@@ -719,8 +717,6 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           <p>愿红包满载 好茶飘香</p>
           <p>美食不断 笑声不绝</p>
           <p>很高兴今天有您共见欢喜</p>
-          <p></p>
-          <p>二O二六年九月12日</p>
           </div>
       </div>
 
@@ -844,7 +840,8 @@ function ReceptionGuestHome({ data }: { data: Record<string, unknown> }) {
           letterSpacing: "0.28em", textTransform: "uppercase",
           color: RC.warmGold, margin: 0,
         }}>
-          September 12, 2026 · 二〇二六年九月十二日
+          <p>September 12, 2026</p>
+          <p> 二〇二六年九月十二日</p>
         </p>
       </div>
 
