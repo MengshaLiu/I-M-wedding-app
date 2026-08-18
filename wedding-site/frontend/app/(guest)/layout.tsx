@@ -60,7 +60,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
           }}>
             <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/wedding/logo.png" alt="I & M" style={{ height: 105, width: "auto", mixBlendMode: "screen" }} />
+              <img src="/wedding/logo.png" alt="I & M" style={{ height: 150, width: 150, mixBlendMode: "screen"}} />
             </Link>
             <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
               {links.map(({ label, href }) => (
@@ -107,7 +107,7 @@ export default async function GuestLayout({ children }: { children: React.ReactN
         }}>
           <Link href="/" style={{ textDecoration: "none", lineHeight: 0 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/wedding/chinese-logo.png" alt="I & M" style={{ height: 105, width: "auto", mixBlendMode: "screen" }} />
+            <img src="/wedding/chinese-logo.png" alt="I & M" style={{ height: 180, width: 180, mixBlendMode: "screen"}} />
           </Link>
           <div style={{ display: "flex", gap: 24, flexWrap: "nowrap" }}>
             {receptionLinks.map(({ label, chinese, href }) => (
